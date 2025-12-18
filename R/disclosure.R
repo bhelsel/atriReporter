@@ -56,6 +56,12 @@ get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
     apply_labels = apply_labels
   )
 
+  recall$frss <- ifelse(is.na(recall$frssa), recall$frssb, recall$frssa)
+  recall$frssa <- recall$frssb <- NULL
+
+  recall$crss <- ifelse(is.na(recall$crssa), recall$crssb, recall$crssa)
+  recall$crssa <- recall$crssb <- NULL
+
   ntgedsd <- get_ntgedsd(
     !!!key$ntgedsd,
     site = site,
@@ -81,3 +87,8 @@ get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
 
   return(data)
 }
+
+# data <- get_disclosure(site = "KUMC")
+# readr::write_csv(data, file = "/Users/bhelsel/Desktop/Projects/ABC-DS Disclosure/abcds_data.csv")
+# devtools::load_all()
+# print(dplyr::select(data, frssa:crss), n = 30)
