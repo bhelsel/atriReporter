@@ -5,7 +5,7 @@
 #' @importFrom tools R_user_dir
 
 .onLoad <- function(libname, pkgname) {
-  cache_dir <- tools::R_user_dir("abcdsReporter", "cache")
+  cache_dir <- tools::R_user_dir("atriReporter", "cache")
   if (!dir.exists(cache_dir)) {
     dir.create(cache_dir, recursive = TRUE)
   }
@@ -16,7 +16,7 @@
   .abcds_cache$memoised_atri_get <- memoise::memoise(atri_get, cache = cache)
 
   .abcds_cache$clear_abcds_cache <- function() {
-    cache_dir <- tools::R_user_dir("abcdsReporter", "cache")
+    cache_dir <- tools::R_user_dir("atriReporter", "cache")
     unlink(cache_dir, recursive = TRUE)
   }
 }

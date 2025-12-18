@@ -5,8 +5,6 @@
 #' variable labels for enhanced interpretability.
 #'
 #' @param ... One or more unquoted variable names to retrieve from the dataset.
-#' @param dataset A symbol or string specifying the dataset name within the ABC-DS data repository.
-#' @param codebook A symbol or string specifying the corresponding codebook to use for metadata.
 #' @param site Optional; a site identifier or vector of site codes to subset data by site. Default is `NULL`.
 #' @param cycle Optional; a cycle identifier or vector of cycles to subset data by cycle. Default is `NULL`.
 #' @param apply_labels Logical; if `TRUE`, applies variable labels from the codebook to the returned data. Default is `FALSE`.
@@ -50,8 +48,8 @@ get_ntgedsd <- function(
 ) {
     variables <- as.character(rlang::ensyms(...))
     get_abcds_data(
-        dataset = ntgedsd,
-        codebook = ntgedsd,
+        dataset = "ntgedsd",
+        codebook = "ntgedsd",
         variables,
         site = site,
         cycle = cycle,
@@ -59,6 +57,3 @@ get_ntgedsd <- function(
         controls = controls
     )
 }
-
-# devtools::load_all()
-# get_ntgedsd()

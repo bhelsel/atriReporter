@@ -49,8 +49,8 @@ get_karyotype <- function(
 ) {
   variables <- as.character(rlang::ensyms(...))
   get_abcds_data(
-    dataset = karyotype,
-    codebook = karyotype,
+    dataset = "karyotype",
+    codebook = "karyotype",
     variables,
     site = site,
     cycle = cycle,

@@ -5,9 +5,9 @@
 #| eval: !expr params$enrollment_by_cycle
 #| results: asis
 
-abcdsReporter:::format_quarto("Enrollment by Year", "subsection")
+atriReporter:::format_quarto("Enrollment by Year", "subsection")
 
-atri_registry <- abcdsReporter::get_registry(examdate, apply_labels = TRUE)
+atri_registry <- atriReporter::get_registry(examdate, apply_labels = TRUE)
 
 atri_registry$event_label <- gsub(
   " - Month [0-9]{1,2}",
@@ -36,11 +36,11 @@ data.frame(
   tidyr::pivot_wider(names_from = Cycle, values_from = Value) %>%
   rbind(enrollment_tbl, .) %>%
   flextable::flextable() %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::width(j = 1, width = 1.25) %>%
   flextable::width(j = 2:5, width = 1)
 
-abcdsReporter:::format_quarto(type = "newpage")
+atriReporter:::format_quarto(type = "newpage")
 
 ```
 
@@ -59,7 +59,7 @@ demographic_variables <- c(
 )
 
 atri_demographics <-
-  abcdsReporter::get_demographics(
+  atriReporter::get_demographics(
     !!!demographic_variables,
     site = NULL,
     cycle = NULL,
@@ -75,7 +75,7 @@ if (!is.null(params$lonidir)) {
 
   loni_demographics <- abcds::apply_factor_labels(loni_demographics)
 
-  atri_demographics <- abcdsReporter:::loni_join(
+  atri_demographics <- atriReporter:::loni_join(
     atri_data = atri_demographics,
     loni_data = loni_demographics,
     variables = demographic_variables
@@ -90,7 +90,7 @@ if (!is.null(params$lonidir)) {
 #| eval: !expr params$demographics
 #| results: asis
 
-abcdsReporter:::format_quarto("Demographics", "subsection")
+atriReporter:::format_quarto("Demographics", "subsection")
 
 if ("u01_event_code" %in% names(atri_demographics)) {
   baseline_demographics <- atri_demographics %>%
@@ -135,13 +135,13 @@ baseline_demographics %>%
   flextable::set_header_labels(
     values = c("Variable", paste0("N = ", nrow(baseline_demographics)))
   ) %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::bold(i = c(1:2, 5:6), j = 1) %>%
   flextable::width(j = 1, width = 4) %>%
   flextable::width(j = 2, width = 1.5)
 
 
-abcdsReporter:::format_quarto(type = "newpage")
+atriReporter:::format_quarto(type = "newpage")
 
 ```
 

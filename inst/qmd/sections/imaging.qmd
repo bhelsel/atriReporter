@@ -3,7 +3,7 @@
 #| eval: !expr (params$imaging_scan_counts) | (params$imaging_scan_counts_controls)
 #| results: asis
 
-abcdsReporter:::format_quarto("Imaging Type by Number of Scans", "subsection")
+atriReporter:::format_quarto("Imaging Type by Number of Scans", "subsection")
 
 count_imaging <- function(
   controls = FALSE,
@@ -11,9 +11,9 @@ count_imaging <- function(
 ) {
   atri_imaging <-
     purrr::map(
-      abcdsReporter:::.imaging_key[["atri_scan_names"]],
+      atriReporter:::.imaging_key[["atri_scan_names"]],
       .f = function(x) {
-        img <- abcdsReporter::get_imaging(
+        img <- atriReporter::get_imaging(
           done,
           imaging = x,
           controls = controls
@@ -25,7 +25,7 @@ count_imaging <- function(
       }
     )
 
-  id_vars <- abcdsReporter:::get_ids(atri_imaging[[1]])
+  id_vars <- atriReporter:::get_ids(atri_imaging[[1]])
   atri_imaging <- purrr::reduce(atri_imaging, dplyr::full_join, by = id_vars)
   atri_imaging$ids <- atri_imaging$subject_label
 
@@ -37,7 +37,7 @@ count_imaging <- function(
 
   if (!is.null(lonidir)) {
     loni_imaging <- purrr::map(
-      abcdsReporter:::.imaging_key[["loni_scan_names"]],
+      atriReporter:::.imaging_key[["loni_scan_names"]],
       .f = function(x) {
         img <- abcds::read_imaging(person = person, scan = x)
         img <- img[, c("subject_label", "event_sequence", paste0(x, "_done"))]
@@ -51,20 +51,20 @@ count_imaging <- function(
       by = c("subject_label", "event_sequence")
     )
 
-    atri_imaging <- abcdsReporter:::loni_join(
+    atri_imaging <- atriReporter:::loni_join(
       atri_data = atri_imaging,
       loni_data = loni_imaging,
       variables = paste0(
-        abcdsReporter:::.imaging_key[["loni_scan_names"]],
+        atriReporter:::.imaging_key[["loni_scan_names"]],
         "_done"
       )
     )
   }
 
-  imaging_scan_counts <- abcdsReporter::multiple_count_by(
+  imaging_scan_counts <- atriReporter::multiple_count_by(
     data = atri_imaging,
-    names = paste0(abcdsReporter:::.imaging_key[["loni_scan_names"]], "_done"),
-    labels = abcdsReporter:::.imaging_key[["scan_labels"]],
+    names = paste0(atriReporter:::.imaging_key[["loni_scan_names"]], "_done"),
+    labels = atriReporter:::.imaging_key[["scan_labels"]],
     ids = "ids",
     varname = "Imaging Scan"
   )
@@ -112,7 +112,7 @@ imaging_scan_counts_footnote <- paste(
 imaging_scan_counts %>%
   flextable::as_grouped_data(groups = "Person") %>%
   flextable::as_flextable(hide_grouplabel = TRUE) %>%
-  abcdsReporter:::ft_add_abcds_theme(grouped_column = TRUE) %>%
+  atriReporter:::ft_add_abcds_theme(grouped_column = TRUE) %>%
   flextable::add_footer_row(
     values = imaging_scan_counts_footnote,
     colwidths = (max(imgtime) + 1)
@@ -121,7 +121,7 @@ imaging_scan_counts %>%
   flextable::width(j = 2:(max(imgtime) + 1), width = 3.25 / max(imgtime)) %>%
   flextable::bold(i = ~ !is.na(Person))
 
-abcdsReporter:::format_quarto(type = "newpage")
+atriReporter:::format_quarto(type = "newpage")
 
 
 ```
@@ -132,7 +132,7 @@ abcdsReporter:::format_quarto(type = "newpage")
 #| eval: !expr (params$mri_sequence_counts) | (params$mri_sequence_counts_controls)
 #| results: asis
 
-abcdsReporter:::format_quarto("MRI Sequences by Number of Scans", "subsection")
+atriReporter:::format_quarto("MRI Sequences by Number of Scans", "subsection")
 
 # params <- list()
 # params$lonidir <- "/Users/bhelsel/Desktop/Data/ABCDS LONI DATA"
@@ -140,7 +140,7 @@ abcdsReporter:::format_quarto("MRI Sequences by Number of Scans", "subsection")
 # controls = TRUE
 
 count_mri_sequencing <- function(controls = FALSE, lonidir = NULL) {
-  atri_mri_imaging <- abcdsReporter::get_mri_sequences(
+  atri_mri_imaging <- atriReporter::get_mri_sequences(
     name = "description",
     controls = controls,
     apply_labels = TRUE
@@ -173,10 +173,10 @@ count_mri_sequencing <- function(controls = FALSE, lonidir = NULL) {
     mri_columns <- c(
       "mri_done",
       "mrseqs",
-      abcdsReporter:::.mri_sequence_key[["description"]]
+      atriReporter:::.mri_sequence_key[["description"]]
     )
 
-    atri_mri_imaging <- abcdsReporter:::loni_join(
+    atri_mri_imaging <- atriReporter:::loni_join(
       atri_data = atri_mri_imaging,
       loni_data = loni_mri_imaging,
       variables = mri_columns
@@ -186,10 +186,10 @@ count_mri_sequencing <- function(controls = FALSE, lonidir = NULL) {
       dplyr::filter(!duplicated(u19_bds_id, event_code))
   }
 
-  mri_sequences <- abcdsReporter::multiple_count_by(
+  mri_sequences <- atriReporter::multiple_count_by(
     data = atri_mri_imaging,
-    names = abcdsReporter:::.mri_sequence_key[["description"]],
-    labels = abcdsReporter:::.mri_sequence_key[["abbreviation"]],
+    names = atriReporter:::.mri_sequence_key[["description"]],
+    labels = atriReporter:::.mri_sequence_key[["abbreviation"]],
     ids = "ids",
     varname = "MRI Sequence"
   )
@@ -237,7 +237,7 @@ mri_sequences_counts_footnote <- paste(
 mri_sequence_counts %>%
   flextable::as_grouped_data(groups = "Person") %>%
   flextable::as_flextable(hide_grouplabel = TRUE) %>%
-  abcdsReporter:::ft_add_abcds_theme(grouped_column = TRUE) %>%
+  atriReporter:::ft_add_abcds_theme(grouped_column = TRUE) %>%
   flextable::add_footer_row(
     values = mri_sequences_counts_footnote,
     colwidths = (max(mritime) + 1)
@@ -246,7 +246,7 @@ mri_sequence_counts %>%
   flextable::width(j = 2:(max(mritime) + 1), width = 3 / max(mritime)) %>%
   flextable::bold(i = ~ !is.na(Person))
 
-abcdsReporter:::format_quarto(type = "newpage")
+atriReporter:::format_quarto(type = "newpage")
 
 ```
 
@@ -257,18 +257,18 @@ abcdsReporter:::format_quarto(type = "newpage")
 #| eval: !expr params$imaging_scan_counts_by_site
 #| results: asis
 
-abcdsReporter:::format_quarto("Amyloid PET Scans by Site", "subsection")
+atriReporter:::format_quarto("Amyloid PET Scans by Site", "subsection")
 
 atri_imaging <-
   purrr::map(imaging_map[["atri_scan_names"]], .f = function(x) {
-    img <- abcdsReporter::get_imaging(done, imaging = x)
+    img <- atriReporter::get_imaging(done, imaging = x)
     img$done <- as.numeric(img$done)
     doneindx <- which(colnames(img) == "done")
     colnames(img)[doneindx] <- paste0(gsub("meta", "", x), "_done")
     return(img)
   })
 
-id_vars <- abcdsReporter:::get_ids(atri_imaging[[1]])
+id_vars <- atriReporter:::get_ids(atri_imaging[[1]])
 atri_imaging <- purrr::reduce(atri_imaging, dplyr::full_join, by = id_vars)
 atri_imaging$ids <- atri_imaging$subject_label
 
@@ -291,11 +291,11 @@ atri_imaging %>%
   ) %>%
   dplyr::arrange(Site) %>%
   flextable::flextable() %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::width(j = 1, width = 3) %>%
   flextable::width(j = 2:4, width = 2.25 / 3)
 
-abcdsReporter:::format_quarto(type = "newpage")
+atriReporter:::format_quarto(type = "newpage")
 
 ```
 

@@ -69,8 +69,8 @@ get_demographics <- function(
 ) {
   variables <- as.character(rlang::ensyms(...))
   get_abcds_data(
-    dataset = ptdemog,
-    codebook = ptdemog,
+    dataset = "ptdemog",
+    codebook = "ptdemog",
     variables,
     site = site,
     cycle = cycle,

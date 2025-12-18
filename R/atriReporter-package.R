@@ -1,6 +1,6 @@
-#' @title ABCDS ATRI Tools
+#' @title ATRI API Tools
 #' @description
-#' The **ABCDS ATRI Tools** package provides a suite of helper functions for
+#' The **ATRI API Tools** package provides a suite of helper functions for
 #' interacting with the ATRI EDC data lake API and managing study data.
 #' It supports authentication, file retrieval, importing, summarization, and
 #' standardized formatting of tables and reports.
@@ -57,8 +57,10 @@
 #' - \link[flextable:flextable]{flextable formatting}
 #' - \link[gt:gt]{gt tables}
 #'
+#' @importFrom rlang .data
+#'
 #' @docType package
-#' @name abcdsATRI
+#' @name atriReporter
 #' @keywords internal
 "_PACKAGE"
 
@@ -67,7 +69,5 @@
 
 ## mockable bindings: start
 ## mockable bindings: end
-NULL
-
 
 NULL

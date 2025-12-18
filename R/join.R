@@ -1,6 +1,63 @@
-# Make more flexible for different scenarios
-# Some times I'll want to return first (demographics) and others I'll want a count.
-# Will I always want to merge on the variables - maybe, to make sure they are the same in LONI and ATRI?
+#' Harmonize and Join ATRI and LONI Study Data
+#'
+#' This function performs a full join between ATRI and LONI datasets, harmonizing
+#' variable types, filling missing variables, adding study and event identifiers,
+#' and resolving discrepancies using LONI as the reference standard.
+#'
+#' The join is performed at the participant–event level, with additional shared
+#' variables included to ensure consistency across data sources.
+#'
+#' @param atri_data A data frame containing participant- or event-level data from
+#'   the ATRI source.
+#'
+#' @param loni_data A data frame containing participant- or event-level data from
+#'   the LONI source. When discrepancies arise between ATRI and LONI values, LONI
+#'   values are retained.
+#'
+#' @param variables A character vector of variable names to retain or align across
+#'   datasets. (Currently reserved for future flexibility; not yet directly used.)
+#'
+#' @details
+#' The function proceeds through the following steps:
+#' \enumerate{
+#'   \item Identifies variables common to both datasets (excluding
+#'     \code{subject_label} and \code{age_at_visit}).
+#'   \item Coerces mismatched variable types to character to ensure join
+#'     compatibility.
+#'   \item Ensures that all non-identifier ATRI variables exist in the LONI
+#'     dataset, creating default columns when necessary.
+#'   \item Adds standardized participant and event identifiers to the LONI data.
+#'   \item Renames ATRI subject identifiers to match LONI conventions.
+#'   \item Performs a full join across participant ID, event code, and shared
+#'     variables.
+#'   \item Resolves duplicated columns (\code{.x}/\code{.y}) by prioritizing LONI
+#'     values.
+#'   \item Orders the result by participant ID and event sequence.
+#' }
+#'
+#' Event codes are returned as an ordered factor to preserve longitudinal ordering.
+#'
+#' @return
+#' A data frame containing harmonized ATRI–LONI data with one row per
+#' participant–event combination.
+#'
+#' @seealso
+#' \code{\link[dplyr]{full_join}},
+#' \code{\link[dplyr]{case_when}}
+#'
+#' @examples
+#' \dontrun{
+#' merged_data <- loni_join(
+#'   atri_data = atri_df,
+#'   loni_data = loni_df,
+#'   variables = c("sex", "diagnosis", "education")
+#' )
+#' }
+#'
+#' @importFrom abcds add_study_ids add_event_ids
+#' @importFrom dplyr case_when arrange
+#'
+#' @export
 
 loni_join <- function(atri_data, loni_data, variables) {
   commonvars <- setdiff(
@@ -40,7 +97,7 @@ loni_join <- function(atri_data, loni_data, variables) {
     loni_data,
     inner_join,
     subject_label,
-    event_sequence
+    "event_sequence"
   )
 
   # Rename the subject_label in ATRI to match LONI
@@ -87,7 +144,7 @@ loni_join <- function(atri_data, loni_data, variables) {
     joined_df$u01_niad_adds_id
   )
 
-  dplyr::arrange(joined_df, ids, event_code)
+  dplyr::arrange(joined_df, .data$ids, .data$event_code)
 }
 
 #' @title Flexible Join for dplyr

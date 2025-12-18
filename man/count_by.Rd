@@ -29,6 +29,7 @@ position. It's useful for understanding the distribution of repeated
 measurements or events across subjects.
 }
 \examples{
+\dontrun{
 # Count how many subjects completed a task at each time point
 count_by(atri_cognition, ids, crtt_done)
 
@@ -37,5 +38,5 @@ purrr::map(
   c("crtt_done", "dsmse_done"),
   ~ count_by(atri_cognition, ids, !!rlang::sym(.x))
 )
-
+}
 }

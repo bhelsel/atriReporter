@@ -9,14 +9,14 @@ if (getRversion() >= "2.15.1") {
     "Site",
     "items",
     "edc",
-    "ptdemog",
     "inner_join",
     ".",
     "latest",
     "de_race",
     "abcds",
     "full_join",
-    "data_dictionary"
+    "data_dictionary",
+    "control"
   ))
 }
 
@@ -64,7 +64,7 @@ if (getRversion() >= "2.15.1") {
   ~id , ~abbreviation      , ~description                                                                        ,
   "1" , "T1 MPRAGE/ISSPGR" , "T1 MPRAGE/ISSPGR Sagittal 3D Accelerated MPRAGE/IRSPGR (ADNI3 Sequence)"           ,
   "2" , "3D FLAIR"         , "3D FLAIR Sagittal 3D FLAIR (ADNI3 Sequence)"                                       ,
-  "3" , "T2*/SWI"          , "T2*/SWI Axial 3D ME T2 GRE – Axial 3D T2 GRE – Axial T2 Star/GRE"              ,
+  "3" , "T2*/SWI"          , "T2*/SWI Axial 3D ME T2 GRE \u2013 Axial 3D T2 GRE \u2013 Axial T2 Star/GRE"        ,
   "4" , "DTI"              , "DTI Axial DTI PA (multiband if applicable) Axial DTI AP (multiband if applicable)" ,
   "5" , "ASL"              , "ASL Axial 3D pCASL or Axial 3D PASL"                                               ,
   "6" , "T2 FSE"           , "T2 FSE Sagittal 3D T2 Weighted Sequence"                                           ,

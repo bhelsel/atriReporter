@@ -16,6 +16,7 @@
 #'         indicating how many IDs had an occurrence at that position}
 #'
 #' @examples
+#' \dontrun{
 #' # Count how many subjects completed a task at each time point
 #' count_by(atri_cognition, ids, crtt_done)
 #'
@@ -24,7 +25,7 @@
 #'   c("crtt_done", "dsmse_done"),
 #'   ~ count_by(atri_cognition, ids, !!rlang::sym(.x))
 #' )
-#'
+#'}
 #' @export
 
 count_by <- function(data, id, ..., column, value = 1) {
@@ -33,10 +34,10 @@ count_by <- function(data, id, ..., column, value = 1) {
     dplyr::group_by({{ id }}) %>%
     dplyr::mutate(position = dplyr::row_number()) %>%
     dplyr::ungroup() %>%
-    dplyr::count(..., position, name = "total") %>%
+    dplyr::count(..., .data$position, name = "total") %>%
     tidyr::pivot_wider(
-      names_from = position,
-      values_from = total,
+      names_from = .data$position,
+      values_from = .data$total,
       values_fill = 0
     ) %>%
     dplyr::filter(dplyr::if_any(c(...), ~ !is.na(.x))) %>%
@@ -77,7 +78,7 @@ count_by <- function(data, id, ..., column, value = 1) {
 #' \enumerate{
 #'   \item Iterates through each variable name and its corresponding label using
 #'     \code{purrr::map2()}
-#'   \item For each variable, calls \code{abcdsReporter::count_by()} to count
+#'   \item For each variable, calls \code{atriReporter::count_by()} to count
 #'     occurrences grouped by the specified ID column(s)
 #'   \item Replaces the first column (variable identifier) with the custom label
 #'   \item Combines all individual count tables into a single data frame
@@ -113,6 +114,10 @@ count_by <- function(data, id, ..., column, value = 1) {
 #'
 #' @seealso \code{\link{count_by}}
 #'
+#' @importFrom purrr map2
+#' @importFrom rlang sym
+#' @importFrom dplyr bind_rows mutate across where rename
+#'
 #' @export
 
 multiple_count_by <- function(
@@ -125,7 +130,7 @@ multiple_count_by <- function(
   varname
 ) {
   purrr::map2(names, labels, .f = function(x, y) {
-    counts <- abcdsReporter::count_by(
+    counts <- count_by(
       data = data,
       id = ids,
       ...,
@@ -140,8 +145,83 @@ multiple_count_by <- function(
       dplyr::where(is.numeric),
       ~ ifelse(is.na(.x), 0, .x)
     )) %>%
-    dplyr::rename(!!varname := variable)
+    dplyr::rename(!!varname := .data$variable)
 }
+
+
+#' Write Event Counts to an Excel Worksheet
+#'
+#' This function filters a dataset for rows matching a specified value in a
+#' target column, enumerates events within each subject (or other identifier),
+#' reshapes the data to a wide visit-based format, and writes the result to an
+#' Excel worksheet. If the Excel file or worksheet already exists, it is replaced.
+#'
+#' The output includes one row per identifier, with event codes spread across
+#' visit columns (e.g., \code{V1}, \code{V2}, \code{V3}), and a summary row at the
+#' top containing counts of non-missing events per visit.
+#'
+#' @param data A data frame containing event-level data.
+#'
+#' @param file A character string specifying the path to the Excel file
+#'   (\code{.xlsx}) to create or update.
+#'
+#' @param sheetName A character string giving the name of the worksheet to write.
+#'   If the sheet already exists, it will be removed and recreated.
+#'
+#' @param id A tidy-evaluated column identifying subjects or units (e.g.,
+#'   \code{subject_id}). Events are counted and ordered within this identifier.
+#'
+#' @param ... Additional columns to retain in the output (unquoted). These are
+#'   typically descriptive or grouping variables to appear alongside the ID.
+#'
+#' @param column A tidy-evaluated column used to filter rows (e.g., an indicator
+#'   variable marking qualifying events).
+#'
+#' @param value The value in \code{column} that indicates an event should be
+#'   included. Defaults to \code{1}.
+#'
+#' @details
+#' The function:
+#' \enumerate{
+#'   \item Filters \code{data} to rows where \code{column == value}.
+#'   \item Orders qualifying events within each \code{id} and assigns visit
+#'     positions (V1, V2, ...).
+#'   \item Reshapes the data to a wide format with one row per \code{id}.
+#'   \item Prepends a summary row showing counts of events per visit column.
+#'   \item Writes the result to an Excel worksheet using \pkg{openxlsx}.
+#' }
+#'
+#' Identifier variables (\code{subject_label}, \code{u19_bds_id},
+#' \code{u01_niad_adds_id}) are automatically filled down/up and preserved when
+#' present in the input data.
+#'
+#' @return
+#' Invisibly returns \code{NULL}. The primary side effect is writing data to an
+#' Excel file.
+#'
+#' @seealso
+#' \code{\link[openxlsx]{writeData}},
+#' \code{\link[tidyr]{pivot_wider}}
+#'
+#' @examples
+#' \dontrun{
+#' write_counts_to_xlsx(
+#'   data = events,
+#'   file = "counts.xlsx",
+#'   sheetName = "Event Counts",
+#'   id = subject_id,
+#'   column = event_flag,
+#'   value = 1,
+#'   event_date, event_type
+#' )
+#' }
+#'
+#' @importFrom rlang `:=`
+#' @importFrom dplyr select all_of group_by distinct ungroup filter mutate row_number right_join
+#' @importFrom tidyr fill pivot_wider
+#' @importFrom openxlsx loadWorkbook createWorkbook removeWorksheet addWorksheet writeData saveWorkbook
+#'
+#' @export
 
 write_counts_to_xlsx <- function(
   data,
@@ -152,6 +232,8 @@ write_counts_to_xlsx <- function(
   column,
   value = 1
 ) {
+  `:=` <- rlang::`:=`
+
   idvars <- c("subject_label", "u19_bds_id", "u01_niad_adds_id")
   identifiers <- data %>%
     dplyr::select({{ id }}, dplyr::all_of(idvars)) %>%
@@ -166,9 +248,9 @@ write_counts_to_xlsx <- function(
     dplyr::mutate(
       {{ column }} := as.integer({{ column }}),
       position = dplyr::row_number(),
-      event_code = as.character(event_code)
+      event_code = as.character(.data$event_code)
     ) %>%
-    dplyr::select({{ id }}, ..., {{ column }}, position) %>%
+    dplyr::select({{ id }}, ..., {{ column }}, .data$position) %>%
     dplyr::ungroup()
 
   visit_columns <- paste0("V", 1:max(data$position))
@@ -176,8 +258,8 @@ write_counts_to_xlsx <- function(
 
   data <- data %>%
     tidyr::pivot_wider(
-      names_from = position,
-      values_from = event_code,
+      names_from = .data$position,
+      values_from = .data$event_code,
       values_fill = NA
     ) %>%
     dplyr::right_join(identifiers, ., by = "ids") %>%

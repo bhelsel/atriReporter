@@ -1,8 +1,6 @@
 #' @title FUNCTION_TITLE
 #' @description FUNCTION_DESCRIPTION
 #' @param ... One or more unquoted variable names to retrieve from the dataset.
-#' @param dataset A symbol or string specifying the dataset name within the ABC-DS data repository.
-#' @param codebook A symbol or string specifying the corresponding codebook to use for metadata.
 #' @param site Optional; a site identifier or vector of site codes to subset data by site. Default is `NULL`.
 #' @param cycle Optional; a cycle identifier or vector of cycles to subset data by cycle. Default is `NULL`.
 #' @param apply_labels Logical; if `TRUE`, applies variable labels from the codebook to the returned data. Default is `FALSE`.
@@ -28,8 +26,8 @@ get_consensus <- function(
 ) {
   variables <- as.character(rlang::ensyms(...))
   get_abcds_data(
-    dataset = consensus,
-    codebook = consensus,
+    dataset = "consensus",
+    codebook = "consensus",
     variables,
     site = site,
     cycle = cycle,

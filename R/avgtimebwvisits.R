@@ -3,7 +3,7 @@
 # data <- openxlsx::read.xlsx(path)
 # head(data)
 
-# data <- abcdsReporter::get_registry(examdate)
+# data <- atriReporter::get_registry(examdate)
 
 # library(dplyr)
 
@@ -60,7 +60,7 @@
 #       "Cycle 3 to\n Cycle 4"
 #     )
 #   ) %>%
-#   abcdsReporter:::ft_add_abcds_theme() %>%
+#   atriReporter:::ft_add_abcds_theme() %>%
 #   flextable::add_footer_row(
 #     values = c("Average Number of Months Between Cycles"),
 #     colwidths = 4

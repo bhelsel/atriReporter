@@ -9,8 +9,6 @@
 #' @param ... One or more unquoted variable names to retrieve from the dataset.
 #' @param task Unquoted name of the cognition task to retrieve (e.g., `recall`, `dsmse`).
 #'   Must match one of the known task identifiers listed in `.cognition_tasks`.
-#' @param dataset A symbol or string specifying the dataset name within the ABC-DS data repository.
-#' @param codebook A symbol or string specifying the corresponding codebook to use for metadata.
 #' @param site Optional; a site identifier or vector of site codes to subset data by site. Default is `NULL`.
 #' @param cycle Optional; a cycle identifier or vector of cycles to subset data by cycle. Default is `NULL`.
 #' @param apply_labels Logical; if `TRUE`, applies variable labels from the codebook to the returned data. Default is `FALSE`.

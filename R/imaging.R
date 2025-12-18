@@ -149,9 +149,9 @@ get_mri_sequences <- function(
     ...
 ) {
     name <- match.arg(name)
-    data <- abcdsReporter::get_imaging(
-        done,
-        mrseqs,
+    data <- get_imaging(
+        "done",
+        "mrseqs",
         imaging = "mrimeta",
         ...
     )
@@ -170,7 +170,7 @@ get_mri_sequences <- function(
     }
 
     data$mrseqs <- gsub("\\s*\\|\\s*", "|", data$mrseqs)
-    data <- split_factor_labels(data, mrseqs)
+    data <- split_factor_labels(data, "mrseqs")
 
     data <- data[, c(
         setdiff(names(data), .mri_sequence_key$abbreviation),

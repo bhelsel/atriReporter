@@ -51,8 +51,8 @@ get_exam <- function(
 ) {
   variables <- as.character(rlang::ensyms(...))
   get_abcds_data(
-    dataset = phyneuro,
-    codebook = phyneuro,
+    dataset = "phyneuro",
+    codebook = "phyneuro",
     variables,
     site = site,
     cycle = cycle,

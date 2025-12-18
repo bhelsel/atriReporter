@@ -1,4 +1,4 @@
-Package: abcdsReporter
+Package: atriReporter
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
@@ -6,6 +6,7 @@ Authors@R:
 Description: What the package does (one paragraph).
 License: file LICENSE
 Imports:
+  abcds, 
   bhelselR,
   cli,
   cachem,
@@ -18,6 +19,7 @@ Imports:
   magrittr,
   memoise,
   officer,
+  openxlsx,
   purrr,
   quarto,
   readr,
@@ -28,6 +30,7 @@ Imports:
   yaml
 Remotes:
   bhelsel/bhelselR
+  bhelsel/abcds
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

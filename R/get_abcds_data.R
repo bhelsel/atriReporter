@@ -11,6 +11,7 @@
 #' @param site Optional; a site identifier or vector of site codes to subset data by site. Default is `NULL`.
 #' @param cycle Optional; a cycle identifier or vector of cycles to subset data by cycle. Default is `NULL`.
 #' @param apply_labels Logical; if `TRUE`, applies variable labels from the codebook to the returned data. Default is `FALSE`.
+#' @param controls A boolean value that indicates whether the function should return the controls, Default is `FALSE`
 
 #' @return
 #' A data frame containing the selected variables and any applied filters (site and/or cycle).

@@ -3,9 +3,9 @@
 #| eval: !expr params$healthhistory
 #| results: asis
 
-abcdsReporter:::format_quarto("Health History", "subsection")
+atriReporter:::format_quarto("Health History", "subsection")
 
-healthhistory <- abcdsReporter::get_health(
+healthhistory <- atriReporter::get_health(
   hh_hypothyroidism,
   hh_hyperlipidemia,
   hh_menopausal,
@@ -46,7 +46,7 @@ healthhistory %>%
     `CHD Type` = factor(`CHD Type`, levels = chd, labels = chdlabels)
   ) %>%
   flextable::flextable() %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::width(j = 1, width = 2.25) %>%
   flextable::width(j = 2:5, width = 0.75)
 
@@ -99,7 +99,7 @@ healthhistory %>%
     )
   ) %>%
   flextable::flextable() %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::width(j = 1:5, width = 1.05) %>%
   flextable::add_footer_row(values = diabetes_type, colwidths = 5)
 
@@ -134,7 +134,7 @@ healthhistory %>%
   ) %>%
   cbind(`Health History` = hhvarlabelsyn, .) %>%
   flextable::flextable() %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::width(j = 1, width = 2.05) %>%
   flextable::width(j = 2:3, width = 0.75) %>%
   flextable::width(j = 4, width = 1.75)
@@ -147,7 +147,7 @@ healthhistory %>%
 #| eval: !expr params$healthhistory
 #| results: asis
 
-exam <- abcdsReporter::get_exam(ht, htu, wt, wtu, apply_labels = TRUE)
+exam <- atriReporter::get_exam(ht, htu, wt, wtu, apply_labels = TRUE)
 
 bmi <- exam %>%
   dplyr::group_by(subject_label) %>%
@@ -207,10 +207,10 @@ bmi %>%
   ) %>%
   tidyr::pivot_wider(names_from = Cycle) %>%
   flextable::flextable() %>%
-  abcdsReporter:::ft_add_abcds_theme() %>%
+  atriReporter:::ft_add_abcds_theme() %>%
   flextable::width(width = 5.3 / 4)
 
-abcdsReporter:::format_quarto(type = "newpage")
+atriReporter:::format_quarto(type = "newpage")
 
 ```
 

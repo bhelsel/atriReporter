@@ -22,10 +22,6 @@ get_consensus(
 \item{apply_labels}{Logical; if \code{TRUE}, applies variable labels from the codebook to the returned data. Default is \code{FALSE}.}
 
 \item{controls}{A boolean value that indicates whether the function should return the controls, Default is \code{FALSE}}
-
-\item{dataset}{A symbol or string specifying the dataset name within the ABC-DS data repository.}
-
-\item{codebook}{A symbol or string specifying the corresponding codebook to use for metadata.}
 }
 \value{
 OUTPUT_DESCRIPTION
