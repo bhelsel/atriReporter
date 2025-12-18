@@ -29,7 +29,7 @@ Imports:
   tools,
   yaml
 Remotes:
-  bhelsel/bhelselR
+  bhelsel/bhelselR,
   bhelsel/abcds
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
