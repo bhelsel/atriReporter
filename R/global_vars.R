@@ -85,9 +85,9 @@ if (getRversion() >= "2.15.1") {
 .disclosure_key <- list(
   abcds = list(
     demographics = c("de_eval_date", "de_gender", "age_at_visit"),
-    dsmse = c("dsto2", "dsla2", "colshbx", "colmemscr", "dsvs1"),
+    dsmse = c("dsto2", "dsla2", "colshbx", "dsme1", "dsvs1"),
     recall = c("frssa", "frssb", "crssa", "crssb"),
-    ntgedsd = c("adltot", "ntlctot", "ntswtot", "ntambtot", "ntmemtot", "ntbehtot", "ntsrptot", "ntootot", "nttotal"),
+    ntgedsd = c("adltot", "ntlctot", "ntswtot", "ntambtot", "ntmemtot", "ntbehtot", "ntsrptot", "ntootot"),
     exam = c("ht", "htu", "wt", "wtu", "bpsys", "bpdia")
   ),
   trcds = list()
