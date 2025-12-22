@@ -7,6 +7,8 @@
 #' variable labels for readability.
 #'
 #' @param ... One or more unquoted variable names to retrieve from the dataset.
+#' @param study Character string indicating which study's ATRI EDC data to pull.
+#'   Valid options are `"abcds"` and `"trcds"`.
 #' @param task Unquoted name of the cognition task to retrieve (e.g., `recall`, `dsmse`).
 #'   Must match one of the known task identifiers listed in `.cognition_tasks`.
 #' @param site Optional; a site identifier or vector of site codes to subset data by site. Default is `NULL`.
@@ -19,7 +21,7 @@
 #' defined in `.cognition_tasks`. If a partial match (e.g., `"block"`) corresponds to multiple
 #' tasks, the function prompts the user to be more specific. Once validated, the function
 #' constructs the dataset and codebook names (e.g., `"cogrecall"`) and passes them to
-#' [`get_abcds_data()`].
+#' [`get_data()`].
 #'
 #' @return
 #' A tibble containing the selected variables from the specified cognition dataset, filtered
@@ -33,18 +35,20 @@
 #' }
 #'
 #' @seealso
-#' [`get_abcds_data()`] for the underlying data retrieval logic.
+#' [`get_data()`] for the underlying data retrieval logic.
 #'
 #' @export
 
 get_cognition <- function(
   ...,
+  study = c("abcds", "trcds"),
   task,
   site = NULL,
   cycle = NULL,
   apply_labels = FALSE,
   controls = FALSE
 ) {
+  study <- match.arg(study)
   variables <- as.character(rlang::ensyms(...))
   task <- as.character(rlang::ensym(task))
   if (!task %in% .cognition_tasks) {
@@ -79,9 +83,14 @@ get_cognition <- function(
     )
   }
 
-  task <- rlang::sym(sprintf("cog%s", task))
+  if (study == "abcds") {
+    task <- rlang::sym(sprintf("cog%s", task))
+  } else if (study == "trcds") {
+    task <- rlang::sym(task)
+  }
 
-  get_abcds_data(
+  get_data(
+    study = study,
     dataset = !!task,
     codebook = !!task,
     variables,

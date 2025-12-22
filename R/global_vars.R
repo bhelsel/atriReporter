@@ -1,5 +1,6 @@
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(c(
+    "crf_data",
     "crf_data_exclude_phi",
     "coenroll_exclude_phi",
     "dd_field_name",
@@ -14,6 +15,7 @@ if (getRversion() >= "2.15.1") {
     "latest",
     "de_race",
     "abcds",
+    "trcds",
     "full_join",
     "data_dictionary",
     "control"
@@ -90,5 +92,11 @@ if (getRversion() >= "2.15.1") {
     ntgedsd = c("adltot", "ntlctot", "ntswtot", "ntambtot", "ntmemtot", "ntbehtot", "ntsrptot", "ntootot"),
     exam = c("ht", "htu", "wt", "wtu", "bpsys", "bpdia")
   ),
-  trcds = list()
+  trcds = list(
+    registry = c("examdate"),
+    dsmse = c("dsto2", "dsla2", "colshbx", "dsme1", "dsvs1"),
+    recall = c("frssa", "frssb", "crssa", "crssb"),
+    ntgedsd = c("adltot", "ntlctot", "ntswtot", "ntambtot", "ntmemtot", "ntbehtot", "ntsrptot", "ntootot"),
+    exam = c("vsheight", "vshtunit", "vsweight", "vswtunit", "vsbpsys", "vsbpdia")
+  )
 )

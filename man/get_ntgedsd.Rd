@@ -6,6 +6,7 @@
 \usage{
 get_ntgedsd(
   ...,
+  study = c("abcds", "trcds"),
   site = NULL,
   cycle = NULL,
   apply_labels = FALSE,
@@ -14,6 +15,9 @@ get_ntgedsd(
 }
 \arguments{
 \item{...}{One or more unquoted variable names to retrieve from the dataset.}
+
+\item{study}{Character string indicating which study's ATRI EDC data to pull.
+Valid options are \code{"abcds"} and \code{"trcds"}.}
 
 \item{site}{Optional; a site identifier or vector of site codes to subset data by site. Default is \code{NULL}.}
 
@@ -33,7 +37,7 @@ codebook. The function supports optional filtering by site and cycle and allows 
 variable labels for enhanced interpretability.
 }
 \details{
-This function provides a convenient wrapper around get_abcds_data
+This function provides a convenient wrapper around get_data
 to streamline access to ABC-DS NTG-EDSD variables. Quasiquotation is used to support
 tidy evaluation, allowing unquoted variable names and symbol references.
 }

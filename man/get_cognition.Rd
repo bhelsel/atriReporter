@@ -6,6 +6,7 @@
 \usage{
 get_cognition(
   ...,
+  study = c("abcds", "trcds"),
   task,
   site = NULL,
   cycle = NULL,
@@ -15,6 +16,9 @@ get_cognition(
 }
 \arguments{
 \item{...}{One or more unquoted variable names to retrieve from the dataset.}
+
+\item{study}{Character string indicating which study's ATRI EDC data to pull.
+Valid options are \code{"abcds"} and \code{"trcds"}.}
 
 \item{task}{Unquoted name of the cognition task to retrieve (e.g., \code{recall}, \code{dsmse}).
 Must match one of the known task identifiers listed in \code{.cognition_tasks}.}
@@ -42,7 +46,7 @@ This function validates the requested \code{task} against a known set of cogniti
 defined in \code{.cognition_tasks}. If a partial match (e.g., \code{"block"}) corresponds to multiple
 tasks, the function prompts the user to be more specific. Once validated, the function
 constructs the dataset and codebook names (e.g., \code{"cogrecall"}) and passes them to
-\code{\link[=get_abcds_data]{get_abcds_data()}}.
+\code{\link[=get_data]{get_data()}}.
 }
 \examples{
 \dontrun{
@@ -53,5 +57,5 @@ get_cognition(rt_mean, accuracy, task = nback)
 
 }
 \seealso{
-\code{\link[=get_abcds_data]{get_abcds_data()}} for the underlying data retrieval logic.
+\code{\link[=get_data]{get_data()}} for the underlying data retrieval logic.
 }

@@ -15,7 +15,7 @@
 #' If `apply_labels = TRUE`, variable labels are attached to the output as attributes.
 #'
 #' @details
-#' This function provides a convenient wrapper around get_abcds_data
+#' This function provides a convenient wrapper around get_data
 #' to streamline access to ABC-DS blood variables. Quasiquotation is used to support
 #' tidy evaluation, allowing unquoted variable names and symbol references.
 #'
@@ -47,7 +47,7 @@ get_blood <- function(
   controls = FALSE
 ) {
   variables <- as.character(rlang::ensyms(...))
-  get_abcds_data(
+  get_data(
     dataset = "bloodcoll",
     codebook = "bloodcoll",
     variables,
@@ -75,7 +75,7 @@ get_blood <- function(
 #' If `apply_labels = TRUE`, variable labels are attached to the output as attributes.
 #'
 #' @details
-#' This function provides a convenient wrapper around get_abcds_data
+#' This function provides a convenient wrapper around get_data
 #' to streamline access to ABC-DS CSF variables. Quasiquotation is used to support
 #' tidy evaluation, allowing unquoted variable names and symbol references.
 #'
@@ -107,7 +107,7 @@ get_csf <- function(
   controls = FALSE
 ) {
   variables <- as.character(rlang::ensyms(...))
-  get_abcds_data(
+  get_data(
     dataset = "csfcoll",
     codebook = "csfcoll",
     variables,

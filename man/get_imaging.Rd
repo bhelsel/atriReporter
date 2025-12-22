@@ -6,6 +6,7 @@
 \usage{
 get_imaging(
   ...,
+  study = c("abcds", "trcds"),
   site = NULL,
   cycle = NULL,
   apply_labels = FALSE,
@@ -15,6 +16,9 @@ get_imaging(
 }
 \arguments{
 \item{...}{One or more unquoted variable names to select from the imaging dataset.}
+
+\item{study}{Character string indicating which study's ATRI EDC data to pull.
+Valid options are \code{"abcds"} and \code{"trcds"}.}
 
 \item{site}{Optional. A site code, site initials, or partial site label to filter
 the dataset. Defaults to \code{NULL}, returning all sites.}

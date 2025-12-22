@@ -336,3 +336,64 @@ get_sibling_controls <- function() {
   ]
   return(sibling_control_identifiers)
 }
+
+#' @title Add variables to the ABC-DS dataset located in the translated value column
+#' @description Add variables to the ABC-DS dataset located in the translated value column
+#' @return A tibble or data frame
+#' @details Add variables to the ABC-DS dataset located in the translated value column
+#' @rdname add_translated_value
+#' @keywords internal
+
+add_translated_value <- function(
+  data,
+  variables,
+  translated_variables = c("examdate", "mrseqs")
+) {
+  for (i in translated_variables) {
+    if (i %in% variables) {
+      if (!is.character(data$dd_revision_field_value)) {
+        data$dd_revision_field_value <- as.character(
+          data$dd_revision_field_value
+        )
+      }
+      data[data$dd_field_name == i, "dd_revision_field_value"] <- data[
+        data$dd_field_name == i,
+        "dd_revision_field_translated_value"
+      ]
+    }
+  }
+  return(data)
+}
+
+
+#' @title Use a custom pivot wider that can handle an abcds_df class
+#' @description Use a custom pivot wider that can handle an abcds_df class
+#' @return A tibble or data frame
+#' @details Use a custom pivot wider that can handle an abcds_df class
+#' @rdname atri_pivot_wider
+#' @keywords internal
+
+atri_pivot_wider <- function(data, dataset) {
+  custom_classes <- class(data)
+  class(data) <- class(data)[!grepl("abcds_df|trcds_df", class(data))]
+  ids <- get_ids(data)
+  duplicates <- c("mrimeta", "taumeta", "bloodcoll")
+  safe_max <- function(x) {
+    if (length(x[!is.na(x)]) == 0) {
+      return(NA_character_)
+    } else {
+      return(as.character(max(x[!is.na(x)])))
+    }
+  }
+
+  data <- tidyr::pivot_wider(
+    data,
+    id_cols = dplyr::all_of(ids),
+    names_from = dd_field_name,
+    values_from = dd_revision_field_value,
+    values_fn = if (dataset %in% duplicates) safe_max else NULL
+  )
+
+  class(data) <- custom_classes
+  return(data)
+}

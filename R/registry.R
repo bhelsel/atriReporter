@@ -5,6 +5,8 @@
 #' variable labels for enhanced interpretability.
 #'
 #' @param ... One or more unquoted variable names to retrieve from the dataset.
+#' @param study Character string indicating which study's ATRI EDC data to pull.
+#'   Valid options are `"abcds"` and `"trcds"`.
 #' @param site Optional; a site identifier or vector of site codes to subset data by site. Default is `NULL`.
 #' @param cycle Optional; a cycle identifier or vector of cycles to subset data by cycle. Default is `NULL`.
 #' @param apply_labels Logical; if `TRUE`, applies variable labels from the codebook to the returned data. Default is `FALSE`.
@@ -15,7 +17,7 @@
 #' If `apply_labels = TRUE`, variable labels are attached to the output as attributes.
 #'
 #' @details
-#' This function provides a convenient wrapper around get_abcds_data
+#' This function provides a convenient wrapper around get_data
 #' to streamline access to ABC-DS registry variables. Quasiquotation is used to support
 #' tidy evaluation, allowing unquoted variable names and symbol references.
 #'
@@ -40,13 +42,16 @@
 
 get_registry <- function(
   ...,
+  study = c("abcds", "trcds"),
   site = NULL,
   cycle = NULL,
   apply_labels = FALSE,
   controls = FALSE
 ) {
+  study <- match.arg(study)
   variables <- as.character(rlang::ensyms(...))
-  get_abcds_data(
+  get_data(
+    study = study,
     dataset = "registry",
     codebook = "registry",
     variables,

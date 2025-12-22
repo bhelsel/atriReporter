@@ -4,6 +4,8 @@
 #' Retrieves variables needed for the BRIDGE21 Down syndrome
 #' disclosure report from the ATRI Electronic Data Capture system
 #'
+#' @param study Character string indicating which study's ATRI EDC data to pull.
+#'   Valid options are `"abcds"` and `"trcds"`.
 #' @param site An optional site code or name used to filter the demographic data;
 #' defaults to \code{NULL}, returning all sites.
 #' @param cycle An optional study cycle identifier used to filter the data;
@@ -28,20 +30,37 @@
 #' @export
 #' @importFrom purrr reduce
 
-get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
-  key <- .disclosure_key$abcds
+get_disclosure <- function(
+  study = c("abcds", "trcds"),
+  site = NULL,
+  cycle = NULL,
+  apply_labels = FALSE
+) {
+  study <- match.arg(study)
+  key <- .disclosure_key[[study]]
 
-  demographics <- get_demographics(
-    !!!key$demographics,
-    site = site,
-    cycle = cycle,
-    apply_labels = apply_labels
-  )
+  if (study == "abcds") {
+    demographics <- get_demographics(
+      !!!key$demographics,
+      site = site,
+      cycle = cycle,
+      apply_labels = apply_labels
+    )
+  } else if (study == "trcds") {
+    demographics <- get_registry(
+      !!!key$registry,
+      study = study,
+      site = site,
+      cycle = cycle,
+      apply_labels = apply_labels
+    )
+  }
 
   ids <- get_ids(demographics)
 
   dsmse <- get_cognition(
     !!!key$dsmse,
+    study = study,
     task = dsmse,
     site = site,
     cycle = cycle,
@@ -50,6 +69,7 @@ get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
 
   recall <- get_cognition(
     !!!key$recall,
+    study = study,
     task = recall,
     site = site,
     cycle = cycle,
@@ -64,6 +84,7 @@ get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
 
   ntgedsd <- get_ntgedsd(
     !!!key$ntgedsd,
+    study = study,
     site = site,
     cycle = cycle,
     apply_labels = apply_labels
@@ -71,6 +92,7 @@ get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
 
   exam <- get_exam(
     !!!key$exam,
+    study = study,
     site = site,
     cycle = cycle,
     apply_labels = apply_labels
@@ -87,8 +109,3 @@ get_disclosure <- function(site = NULL, cycle = NULL, apply_labels = FALSE) {
 
   return(data)
 }
-
-# data <- get_disclosure(site = "KUMC")
-# readr::write_csv(data, file = "/Users/bhelsel/Desktop/Projects/ABC-DS Disclosure/abcds_data.csv")
-# devtools::load_all()
-# print(dplyr::select(data, frssa:crss), n = 30)

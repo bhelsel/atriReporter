@@ -7,6 +7,8 @@
 #' variable and factor labels.
 #'
 #' @param ... One or more unquoted variable names to select from the imaging dataset.
+#' @param study Character string indicating which study's ATRI EDC data to pull.
+#'   Valid options are `"abcds"` and `"trcds"`.
 #' @param site Optional. A site code, site initials, or partial site label to filter
 #'   the dataset. Defaults to \code{NULL}, returning all sites.
 #' @param cycle Optional. A numeric cycle or month value to filter the dataset.
@@ -65,15 +67,18 @@
 
 get_imaging <- function(
     ...,
+    study = c("abcds", "trcds"),
     site = NULL,
     cycle = NULL,
     apply_labels = FALSE,
     controls = FALSE,
     imaging = c("amymeta", "taumeta", "fdgmeta", "mrimeta")
 ) {
+    study <- match.arg(study)
     variables <- as.character(rlang::ensyms(...))
     imaging <- match.arg(imaging)
-    get_abcds_data(
+    get_data(
+        study = study,
         dataset = !!imaging,
         codebook = !!imaging,
         variables,

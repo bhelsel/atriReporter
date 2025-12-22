@@ -164,6 +164,7 @@ get_atri_data <- function(response) {
       data <- readr::read_csv(
         response,
         show_col_types = FALSE,
+        guess_max = 2000,
         name_repair = ~ gsub("[.]", "_", .x)
       )
     }

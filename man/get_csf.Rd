@@ -27,7 +27,7 @@ codebook. The function supports optional filtering by site and cycle and allows 
 variable labels for enhanced interpretability.
 }
 \details{
-This function provides a convenient wrapper around get_abcds_data
+This function provides a convenient wrapper around get_data
 to streamline access to ABC-DS CSF variables. Quasiquotation is used to support
 tidy evaluation, allowing unquoted variable names and symbol references.
 }

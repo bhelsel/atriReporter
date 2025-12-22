@@ -97,24 +97,57 @@ filter_by_site <- function(data, site) {
 #' @export
 
 filter_by_cycle <- function(data, cycle) {
-  event_label_options <- strsplit(unique(data$event_label), " - ")
-  cycle_options <- purrr::map_chr(event_label_options, ~ .x[[1]])
-  cycle_options_num <- as.numeric(gsub("Cycle ", "", cycle_options))
-  month_options <- purrr::map_chr(event_label_options, ~ .x[[2]])
-  month_options_num <- as.numeric(gsub("Month ", "", month_options))
+  # Detect dataset format
+  has_cycle_format <- any(grepl("Cycle \\d+ - Month \\d+", data$event_label))
+  has_month_only_format <- any(grepl(
+    "^(Baseline|Month \\d+)$",
+    data$event_label
+  ))
 
-  if (is.numeric(cycle)) {
-    if (cycle %% 16 == 0 & cycle %in% month_options_num) {
-      data <- data[grepl(paste("Month", cycle), data$event_label), ]
-    } else if (cycle %in% cycle_options_num) {
-      data <- data[grepl(paste("Cycle", cycle), data$event_label), ]
-    } else {
-      message(
-        "Did not recognize cycle ",
-        cycle,
-        ". Returning all cycles by default."
-      )
+  if (has_cycle_format) {
+    # Original logic for "Cycle X - Month Y" format
+    event_label_options <- strsplit(unique(data$event_label), " - ")
+    cycle_options <- purrr::map_chr(event_label_options, ~ .x[[1]])
+    cycle_options_num <- as.numeric(gsub("Cycle ", "", cycle_options))
+    month_options <- purrr::map_chr(event_label_options, ~ .x[[2]])
+    month_options_num <- as.numeric(gsub("Month ", "", month_options))
+
+    if (is.numeric(cycle)) {
+      if (cycle %% 16 == 0 & cycle %in% month_options_num) {
+        data <- data[grepl(paste("Month", cycle), data$event_label), ]
+      } else if (cycle %in% cycle_options_num) {
+        data <- data[grepl(paste("Cycle", cycle), data$event_label), ]
+      } else {
+        message(
+          "Did not recognize cycle ",
+          cycle,
+          ". Returning all cycles by default."
+        )
+      }
     }
+  } else if (has_month_only_format) {
+    # Logic for "Baseline", "Month X" format
+    if (is.numeric(cycle)) {
+      if (cycle == 0) {
+        data <- data[data$event_label == "Baseline", ]
+      } else {
+        target_label <- paste("Month", cycle)
+        if (target_label %in% data$event_label) {
+          data <- data[data$event_label == target_label, ]
+        } else {
+          message(
+            "Did not recognize cycle/month ",
+            cycle,
+            ". Returning all timepoints by default."
+          )
+        }
+      }
+    } else if (is.character(cycle) && cycle == "Baseline") {
+      data <- data[data$event_label == "Baseline", ]
+    }
+  } else {
+    warning("Could not detect event_label format. Returning all data.")
   }
+
   return(data)
 }

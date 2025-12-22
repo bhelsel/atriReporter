@@ -4,9 +4,17 @@
 \alias{get_disclosure}
 \title{Retrieve the Disclosure Variables from ATRI}
 \usage{
-get_disclosure(site = NULL, cycle = NULL, apply_labels = FALSE)
+get_disclosure(
+  study = c("abcds", "trcds"),
+  site = NULL,
+  cycle = NULL,
+  apply_labels = FALSE
+)
 }
 \arguments{
+\item{study}{Character string indicating which study's ATRI EDC data to pull.
+Valid options are \code{"abcds"} and \code{"trcds"}.}
+
 \item{site}{An optional site code or name used to filter the demographic data;
 defaults to \code{NULL}, returning all sites.}
 

@@ -15,7 +15,7 @@
 #' If `apply_labels = TRUE`, variable labels are attached to the output as attributes.
 #'
 #' @details
-#' This function provides a convenient wrapper around get_abcds_data
+#' This function provides a convenient wrapper around get_data
 #' to streamline access to ABC-DS health variables. Quasiquotation is used to support
 #' tidy evaluation, allowing unquoted variable names and symbol references.
 #'
@@ -47,7 +47,7 @@ get_health <- function(
   controls = FALSE
 ) {
   variables <- as.character(rlang::ensyms(...))
-  get_abcds_data(
+  get_data(
     dataset = "healthhistory_",
     codebook = "healthhistory.csv",
     variables,
