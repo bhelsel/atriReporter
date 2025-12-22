@@ -98,14 +98,41 @@ get_disclosure <- function(
     apply_labels = apply_labels
   )
 
+  # ABC-DS and TRC-DS Codebook: Weight: 1 = Pounds, 2 = Kilograms; Height: 1 = Inches, 2 = Centimeters
+  convert_to_metric <- function(variable, unit, type = c("height", "weight")) {
+    type <- match.arg(type)
+    conversion_factor <- if (type == "height") 2.54 else 1 / 2.205
+    ifelse(unit == 1 & !is.na(unit), variable * conversion_factor, variable)
+  }
+
+  # fmt: skip
+  if (study == "abcds") {
+    exam$ht <- convert_to_metric(exam$ht, exam$htu, type = "height")
+    exam$wt <- convert_to_metric(exam$wt, exam$wtu, type = "weight")
+    exam$htu <- exam$wtu <- NULL
+  } else if (study == "trcds") {
+    exam$vsheight <- convert_to_metric(exam$vsheight, exam$vshtunit, type = "height")
+    exam$vsweight <- convert_to_metric(exam$vsweight, exam$vswtunit, type = "weight")
+    exam$vshtunit <- exam$vswtunit <- NULL
+  }
+
   df_names <- c("demographics", "dsmse", "recall", "ntgedsd", "exam")
 
   data <- purrr::reduce(
     mget(df_names),
     .f = atri_join,
-    join_type = inner_join,
+    join_type = full_join,
     by = ids
   )
 
-  return(data)
+  all_vars <- key %>%
+    do.call("c", .) %>%
+    {
+      .[. %in% names(data)]
+    } %>%
+    as.character()
+
+  data %>%
+    dplyr::filter(!dplyr::if_all(all_of(all_vars), ~ is.na(.x))) %>%
+    dplyr::arrange(subject_label, event_code)
 }
