@@ -105,6 +105,8 @@ get_disclosure <- function(
     ifelse(unit == 1 & !is.na(unit), variable * conversion_factor, variable)
   }
 
+  df_names <- c("demographics", "dsmse", "recall", "ntgedsd", "exam")
+
   # fmt: skip
   if (study == "abcds") {
     exam$ht <- convert_to_metric(exam$ht, exam$htu, type = "height")
@@ -114,9 +116,9 @@ get_disclosure <- function(
     exam$vsheight <- convert_to_metric(exam$vsheight, exam$vshtunit, type = "height")
     exam$vsweight <- convert_to_metric(exam$vsweight, exam$vswtunit, type = "weight")
     exam$vshtunit <- exam$vswtunit <- NULL
+    centiloid <- get_imaging(study = "trcds", imaging = "amymeta")
+    df_names <- c(df_names, "centiloid")
   }
-
-  df_names <- c("demographics", "dsmse", "recall", "ntgedsd", "exam")
 
   data <- purrr::reduce(
     mget(df_names),
@@ -136,3 +138,10 @@ get_disclosure <- function(
     dplyr::filter(!dplyr::if_all(all_of(all_vars), ~ is.na(.x))) %>%
     dplyr::arrange(subject_label, event_code)
 }
+
+# devtools::load_all()
+# start <- Sys.time()
+# get_imaging(study = "trcds", imaging = "amymeta")
+# end <- Sys.time()
+# difftime(end, start)
+# data <- get_disclosure(study = "trcds")

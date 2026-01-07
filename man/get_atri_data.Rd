@@ -4,10 +4,12 @@
 \alias{get_atri_data}
 \title{Retrieve Data from ATRI EDC API}
 \usage{
-get_atri_data(response)
+get_atri_data(response, xlsx = FALSE)
 }
 \arguments{
 \item{response}{A response object returned by an \code{httr2} request.}
+
+\item{xlsx}{A boolean value indicating whether the file to be read is xlsx, Default: FALSE}
 }
 \value{
 Either a character vector containing folder or file names, or a

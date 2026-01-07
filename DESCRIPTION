@@ -23,6 +23,7 @@ Imports:
   purrr,
   quarto,
   readr,
+  readxl,
   rlang,
   tibble,
   tidyr,

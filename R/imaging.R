@@ -77,7 +77,8 @@ get_imaging <- function(
     study <- match.arg(study)
     variables <- as.character(rlang::ensyms(...))
     imaging <- match.arg(imaging)
-    get_data(
+
+    data <- get_data(
         study = study,
         dataset = !!imaging,
         codebook = !!imaging,
@@ -87,6 +88,32 @@ get_imaging <- function(
         apply_labels = apply_labels,
         controls = controls
     )
+
+    # Retrieve Centiloid Values for TRC-DS study only
+    if (imaging == "amymeta" & study == "trcds") {
+        file <- get_atri_files(trcds, "External%20Data")
+        centiloid <- import_atri_file(
+            trcds,
+            files = file,
+            pattern = "CENTILOID"
+        ) %>%
+            dplyr::rename(
+                subject_label = `Subject ID`,
+                event_code = Scan,
+                centiloid = CL
+            ) %>%
+            dplyr::mutate(
+                event_code = ifelse(event_code == "bl", "sc2", event_code)
+            ) %>%
+            dplyr::select(subject_label, event_code, centiloid)
+
+        data <- dplyr::full_join(
+            data,
+            centiloid,
+            by = c("subject_label", "event_code")
+        )
+    }
+    return(data)
 }
 
 #' Get MRI Sequence Data

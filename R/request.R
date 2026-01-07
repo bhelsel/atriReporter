@@ -104,7 +104,8 @@ atri_get <- function(server, token) {
       Authorization = token
     ) %>%
     httr2::req_perform()
-  return(get_atri_data(response))
+  isXLSX <- grepl(".xlsx$", basename(server))
+  return(get_atri_data(response, xlsx = isXLSX))
 }
 
 
@@ -116,6 +117,7 @@ atri_get <- function(server, token) {
 #' (for CSV/structured data).
 #'
 #' @param response A response object returned by an \code{httr2} request.
+#' @param xlsx A boolean value indicating whether the file to be read is xlsx, Default: FALSE
 #'
 #' @return
 #' Either a character vector containing folder or file names, or a
@@ -150,23 +152,33 @@ atri_get <- function(server, token) {
 #' @importFrom rlang is_empty
 #' @importFrom cli cli_abort
 #' @importFrom glue glue
+#' @importFrom readxl read_excel
 
-get_atri_data <- function(response) {
+get_atri_data <- function(response, xlsx = FALSE) {
   status <- httr2::resp_status(response)
   description <- httr2::resp_status_desc(response)
   type <- httr2::resp_content_type(response)
   if (status == 200) {
-    response <- httr2::resp_body_string(response)
-    if (type == "application/json") {
-      data <- jsonlite::fromJSON(response)$data
-      colnames(data) <- to_snake_case(colnames(data))
-    } else if (type == "application/force-download") {
-      data <- readr::read_csv(
-        response,
-        show_col_types = FALSE,
-        guess_max = 2000,
-        name_repair = ~ gsub("[.]", "_", .x)
-      )
+    if (xlsx) {
+      # Write to a temp file
+      tmp <- tempfile(fileext = ".xlsx")
+      writeBin(httr2::resp_body_raw(response), tmp)
+      # Read the Excel file
+      data <- readxl::read_excel(tmp)
+      invisible(file.remove(tmp))
+    } else {
+      response <- httr2::resp_body_string(response)
+      if (type == "application/json") {
+        data <- jsonlite::fromJSON(response)$data
+        colnames(data) <- to_snake_case(colnames(data))
+      } else if (type == "application/force-download") {
+        data <- readr::read_csv(
+          response,
+          show_col_types = FALSE,
+          guess_max = 2000,
+          name_repair = ~ gsub("[.]", "_", .x)
+        )
+      }
     }
   } else {
     stop(status, ": ", description)
