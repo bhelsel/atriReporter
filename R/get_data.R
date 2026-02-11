@@ -66,10 +66,6 @@ get_data <- function(
   class(data) <- c(sprintf("%s_df", study), class(data))
 
   if (study == "abcds") {
-    if ("age_at_visit" %in% variables) {
-      age_at_visit <- calculate_age_at_visit(data, site, cycle)
-    }
-
     if (!rlang::is_empty(variables)) {
       data <- data[data$dd_field_name %in% variables, ]
     }
@@ -78,15 +74,6 @@ get_data <- function(
     data <- add_translated_value(data, variables)
 
     data <- atri_pivot_wider(data, dataset)
-
-    if ("age_at_visit" %in% variables) {
-      data <- atri_join(
-        x = data,
-        y = age_at_visit,
-        by = ids,
-        join_type = full_join
-      )
-    }
 
     data$site_label <- gsub(
       "^(Puerto Rico University).*",

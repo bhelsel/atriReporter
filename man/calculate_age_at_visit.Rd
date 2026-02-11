@@ -4,16 +4,10 @@
 \alias{calculate_age_at_visit}
 \title{Calculate Age at Visit}
 \usage{
-calculate_age_at_visit(data, site, cycle)
+calculate_age_at_visit(data)
 }
 \arguments{
-\item{data}{A dataset containing year of birth and evaluation date (\code{de_eval_date}).}
-
-\item{site}{Optional. A site code or name to restrict calculations to a specific
-study site.}
-
-\item{cycle}{Optional. A study cycle identifier to limit calculations to a
-specific data collection wave.}
+\item{data}{A dataset exported from the ATRI API for which to add an age_at_visit variable}
 }
 \value{
 A data frame or \code{\link[tibble]{tibble}} with participant identifiers and
@@ -21,33 +15,20 @@ their calculated age (in years) at the time of evaluation.
 }
 \description{
 Calculates participant age at the time of evaluation based on year of birth
-and the evaluation date (\code{de_eval_date}). Optionally filters results by
-site or cycle.
+and the evaluation date (\code{de_eval_date}).
 }
 \details{
 The \code{calculate_age_at_visit()} function computes age at the time of evaluation
 in years using the formula:
 \deqn{age = year\_of\_evaluation - year\_of\_birth}
-
-Here, \code{year_of_evaluation} is derived from \code{de_eval_date}.
-It assumes that year of birth is available either directly in the input data or
-via the \code{\link{retrieve_birth_year}} helper function.
-This function is used internally by \code{\link{get_demographics}} when
-\code{age_at_visit} is among the requested variables.
 }
 \examples{
 \dontrun{
 if (interactive()) {
   # Calculate age for all participants
-  age_tbl <- calculate_age_at_visit(demo_data)
+  age_tbl <- get_demographics(de_eval_date) |> calculate_age_at_visit()
 
-  # Calculate age for a specific site and cycle
-  age_tbl_ku <- calculate_age_at_visit(demo_data, site = "KUMC", cycle = 2)
 }
 }
 
-}
-\seealso{
-\code{\link{retrieve_birth_year}},
-\code{\link{get_demographics}}
 }

@@ -80,82 +80,13 @@ get_demographics <- function(
   )
 }
 
-#' @title Retrieve Year of Birth from ABC-DS Data
-#'
-#' @description
-#' Extracts and formats participants’ year of birth from the ABC-DS dataset,
-#' optionally filtering by site. The resulting dataset can be merged with
-#' other study data or used for age calculations.
-#'
-#' @param data A dataset containing participant identifiers and associated
-#' demographic information from the ABC-DS study.
-#' @param site Optional. A site code or name used to filter results to a specific
-#' study site; defaults to \code{NULL}, returning data from all sites.
-#'
-#' @return
-#' A \code{\link[tibble]{tibble}} with participant identifiers and corresponding
-#' year of birth values.
-#'
-#' @details
-#' The \code{retrieve_birth_year()} function retrieves the variable representing
-#' year of birth from the ABC-DS demographics data and converts it into a clean,
-#' analysis-ready format.
-#'
-#' This function is typically used internally by \code{\link{get_demographics}}
-#' to calculate participant age at visit using the evaluation date
-#' (\code{de_eval_date}). However, it can also be called independently when
-#' users need access to year-of-birth data for custom analyses or data merging.
-#'
-#' @examples
-#' \dontrun{
-#' if (interactive()) {
-#'   # Retrieve year of birth for all participants
-#'   birth_years <- retrieve_birth_year(demo_data)
-#'
-#'   # Retrieve year of birth for a specific site
-#'   birth_years_ku <- retrieve_birth_year(demo_data, site = "KUMC")
-#' }
-#' }
-#'
-#' @seealso
-#'  \code{\link[tibble]{as_tibble}},
-#'  \code{\link{get_demographics}}
-#'
-#' @rdname retrieve_birth_year
-#' @export
-#' @importFrom tibble as_tibble
-
-retrieve_birth_year <- function(
-  data,
-  site = NULL
-) {
-  data <- data[data$dd_field_name == "ptdob", ]
-
-  if (!is.null(site)) {
-    data <- filter_by_site(data, site)
-  }
-
-  ids <- get_ids(data)
-
-  colnames(data)[grepl("field_value", colnames(data))] <- "ptdob"
-
-  data <- tibble::as_tibble(data[, c(ids, "ptdob")])
-
-  return(data)
-}
-
 #' @title Calculate Age at Visit
 #'
 #' @description
 #' Calculates participant age at the time of evaluation based on year of birth
-#' and the evaluation date (\code{de_eval_date}). Optionally filters results by
-#' site or cycle.
+#' and the evaluation date (\code{de_eval_date}).
 #'
-#' @param data A dataset containing year of birth and evaluation date (\code{de_eval_date}).
-#' @param site Optional. A site code or name to restrict calculations to a specific
-#' study site.
-#' @param cycle Optional. A study cycle identifier to limit calculations to a
-#' specific data collection wave.
+#' @param data A dataset exported from the ATRI API for which to add an age_at_visit variable
 #'
 #' @return
 #' A data frame or \code{\link[tibble]{tibble}} with participant identifiers and
@@ -166,60 +97,33 @@ retrieve_birth_year <- function(
 #' in years using the formula:
 #' \deqn{age = year\_of\_evaluation - year\_of\_birth}
 #'
-#' Here, \code{year_of_evaluation} is derived from \code{de_eval_date}.
-#' It assumes that year of birth is available either directly in the input data or
-#' via the \code{\link{retrieve_birth_year}} helper function.
-#' This function is used internally by \code{\link{get_demographics}} when
-#' \code{age_at_visit} is among the requested variables.
 #'
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
 #'   # Calculate age for all participants
-#'   age_tbl <- calculate_age_at_visit(demo_data)
+#'   age_tbl <- get_demographics(de_eval_date) |> calculate_age_at_visit()
 #'
-#'   # Calculate age for a specific site and cycle
-#'   age_tbl_ku <- calculate_age_at_visit(demo_data, site = "KUMC", cycle = 2)
 #' }
 #' }
 #'
-#' @seealso
-#'  \code{\link{retrieve_birth_year}},
-#'  \code{\link{get_demographics}}
+#' @importFrom tidyr fill
+#' @importFrom dplyr mutate arrange
 #'
 #' @rdname calculate_age_at_visit
 #' @export
 
-calculate_age_at_visit <- function(data, site, cycle) {
-  ptdoby <- retrieve_birth_year(data, site)
+calculate_age_at_visit <- function(data) {
+  ptdoby <-
+    get_demographics(ptdob, de_eval_date) |>
+    dplyr::arrange(subject_label, event_code) |>
+    tidyr::fill(ptdob, .by = "subject_label", .direction = "down") |>
+    dplyr::mutate(
+      de_eval_date = as.Date(de_eval_date, format = "%Y-%m-%d"),
+      de_eval_year = as.numeric(format(de_eval_date, "%Y")),
+      age_at_visit = de_eval_year - as.numeric(ptdob)
+    )
 
-  data <- data[data$dd_field_name == "de_eval_date", ]
-
-  ids <- get_ids(data)
-
-  data$de_eval_date <- as.Date(
-    data$dd_revision_field_value,
-    tryFormats = c("%Y-%m-%d", "%y-%m-%d", "%m/%d/%y")
-  )
-
-  if (!is.null(site)) {
-    data <- filter_by_site(data, site)
-  }
-
-  if (!is.null(cycle)) {
-    data <- filter_by_cycle(data, cycle)
-  }
-
-  data <- atri_join(
-    data[, c(ids, "de_eval_date")],
-    ptdoby,
-    by = ids,
-    join_type = inner_join
-  )
-
-  data$age_at_visit <- as.numeric(format(data$de_eval_date, "%Y")) -
-    as.numeric(data$ptdob)
-  data$ptdob <- NULL
-  data$de_eval_date <- NULL
-  return(data)
+  # fmt: skip
+  atri_join(data, ptdoby[, c(ids, "age_at_visit")], by = get_ids(data), join_type = left_join)
 }
