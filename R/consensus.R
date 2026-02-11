@@ -26,6 +26,7 @@ get_consensus <- function(
 ) {
   variables <- as.character(rlang::ensyms(...))
   get_data(
+    study = "abcds",
     dataset = "consensus",
     codebook = "consensus",
     variables,

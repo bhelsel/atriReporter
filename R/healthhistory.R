@@ -48,6 +48,7 @@ get_health <- function(
 ) {
   variables <- as.character(rlang::ensyms(...))
   get_data(
+    study = "abcds",
     dataset = "healthhistory_",
     codebook = "healthhistory.csv",
     variables,
