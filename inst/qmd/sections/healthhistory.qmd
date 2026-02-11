@@ -12,6 +12,9 @@ healthhistory <- atriReporter::get_health(
   hh_diabetes,
   hh_diabetes_type,
   hh_hypertension,
+  hh_seizure,
+  hh_str,
+  hh_sleep_apnea,
   hh_asd,
   hh_vsd,
   hh_avcanal,
@@ -62,9 +65,22 @@ hhvars <- c(
   "hh_hypothyroidism",
   "hh_hyperlipidemia",
   "hh_diabetes",
-  "hh_hypertension"
+  "hh_hypertension",
+  "hh_seizure",
+  "hh_str",
+  "hh_sleep_apnea"
 )
-hhvarlabels <- c("Hypothyroidism", "Hyperlipidemia", "Diabetes", "Hypertension")
+
+
+hhvarlabels <- c(
+  "Hypothyroidism",
+  "Hyperlipidemia",
+  "Diabetes",
+  "Hypertension",
+  "Seizure",
+  "Stroke",
+  "Sleep Apnea"
+)
 
 type1 <- sum(healthhistory$hh_diabetes_type == "Type 1", na.rm = TRUE)
 type2 <- sum(healthhistory$hh_diabetes_type == "Type 2", na.rm = TRUE)
@@ -110,6 +126,7 @@ healthhistory %>%
 #| echo: false
 #| eval: !expr params$healthhistory
 #| results: asis
+#| include: false
 
 hhvarsyn <- c("hh_menopausal")
 hhvarlabelsyn <- c("Menopausal")
@@ -192,6 +209,7 @@ variables <- list(
 )
 
 bmi %>%
+  dplyr::filter(event_code != "cyc4") %>%
   dplyr::group_by(Cycle = event_label) %>%
   dplyr::mutate(Total = 1L) %>%
   dplyr::summarise_at(dplyr::vars(htcm:Total), sum) %>%
