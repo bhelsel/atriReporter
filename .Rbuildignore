@@ -2,4 +2,6 @@
 ^atriReporter\.Rproj$
 ^\.Rproj\.user$
 .vscode
+scripts
 scripts/scripts.R
+scripts/consensus.R

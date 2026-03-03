@@ -1,0 +1,61 @@
+task,variable,formulas
+ntgedsd,nttotal,adltot + ntlctot + ntswtot + ntambtot + ntmemtot + ntbehtot + ntsrptot + ntootot
+ntgedsd,nt6d,adltot + ntlctot + ntswtot + ntambtot + ntmemtot + ntbehtot
+dld,dldcs,dld1 + dld2 + dld3
+dld,dldss,dld4 + dld5 + dld6 + dld7 + dld8
+npi,npi_t2,npi_delds + npi_halds + npi_aggds + npi_depds + npi_anxds + npi_elads + npi_apads + npi_disds + npi_irrds + npi_abbds + npi_slpds + npi_appds
+reiss,reisstot,aggrr + anxr + attnr + bodyr + compr + confr + cryr + delur + depdr + destr + eatpr + fearr + hallr + hostr + impur + inatr + lower + nonar + ovser + parar + regbr + sadnr + slppr + socir + temptr + withr
+reiss,aggsum,aggrr + destr + hostr + impur + temptr
+reiss,autsum,echor + objar + ssbr + unmmr + withr
+reiss,reisspsy,confr + delur + hallr + parar + socir
+reiss,reissparan,compr + hallr + hostr + ovser + parar
+reiss,reissdepb,anxr + cryr + fearr + ovser + sadnr
+reiss,reissdepp,bodyr + eatpr + lower + regbr + slppr
+reiss,reissdpb,anxr + attnr + bodyr + compr + depdr
+dsmse,colmemscr,colshbx + dsme1
+dsmse,nonmemory,dspi1 + dsap1 + dsla2 + dsvs1 + dske1
+dsmse,dsmse_to2,dsto2 - colshbx
+dsmse,dsto2,dspi1 + colshbx + dsme1 + dsap1 + dsla2 + dsvs1 + dske1
+dsmse,dsto2,colmemscr + nonmemory
+recall,frssa,frt1sa + frt2sa + frt3sa
+recall,crssa,crt1sa + crt2sa + crt3sa
+recall,trssa,frssa + crssa
+recall,fcrec1sa,frt1sa + crt1sa
+recall,fcrec2sa,frt2sa + crt2sa
+recall,fcrec3sa,frt3sa + crt3sa
+recall,trssa,fcrec1sa + fcrec2sa + fcrec3sa
+recall,ticrsa,ict1sa + ict2sa + ict3sa
+recall,tifrsa,ift1sa + ift2sa + ift3sa
+recall,tifrrepssa,ift1rsa + ift2rsa + ift3rsa
+recall,agfrin1sa,ift1sa + ift1rsa
+recall,agfrin2sa,ift2sa + ift2rsa
+recall,agfrin3sa,ift3sa + ift3rsa
+recall,tifrrepssa,agfrin1sa + agfrin2sa + agfrin3sa
+recall,tafisa,tifrsa + tifrrepssa
+recall,frssb,frt1sb + frt2sb + frt3sb
+recall,crssb,crt1sb + crt2sb + crt3sb
+recall,trssb,frssb + crssb
+recall,fcrec1sb,frt1sb + crt1sb
+recall,fcrec2sb,frt2sb + crt2sb
+recall,fcrec3sb,frt3sb + crt3sb
+recall,trssb,fcrec1sb + fcrec2sb + fcrec3sb
+recall,ticrsb,ict1sb + ict2sb + ict3sb
+recall,tifrsb,ift1sb + ift2sb + ift3sb
+recall,tifrrepssb,ift1rsb + ift2rsb + ift3rsb
+recall,agfrin1sb,ift1sb + ift1rsb
+recall,agfrin2sb,ift2sb + ift2rsb
+recall,agfrin3sb,ift3sb + ift3rsb
+recall,tifrrepssb,agfrin1sb + agfrin2sb + agfrin3sb
+recall,tafisb,tifrsb + tifrrepssb
+iq,kbit2verbraw,kbit2verbkraw + kbit2ridraw
+cancellation,totcorr,tacorr + hscorr + plcorr + lacorr
+cancellation,totomiss,taomiss + hsomiss + plomiss + laomiss
+cancellation,totcomiss,tacomiss + hscomiss + plcomiss + lacomiss
+cancellation,tottime,tatime + hstime + pltime + latime
+verbal,vftotnepraw,vfannepraw + vffdnepraw
+verbal,vftotneprep,vfanneprep + vffdneprep
+verbal,vftotnepnoc,vfannepnoc + vffdnepnoc
+verbal,vftotnepns,vfannepns + vffdnepns
+verbal,vftotexepr,vfanexepr + vffdexepr
+tbatgs,tbaba,tbagait + tbaslh + tbafc + tbass + tbasc + tbap + tbat + tbawt
+blockwisc,hwrssum,exbd + wisbd

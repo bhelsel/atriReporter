@@ -1,5 +1,13 @@
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(c(
+    "ptdob",
+    "de_eval_date",
+    "verbal",
+    "nonverbal",
+    "iq",
+    "min_age",
+    "max_age",
+    "ae",
     "crf_data",
     "crf_data_exclude_phi",
     "coenroll_exclude_phi",
@@ -35,6 +43,7 @@ if (getRversion() >= "2.15.1") {
   "imaging_scan_counts_by_site",
   "consensus_primary_by_cycle",
   "healthhistory",
+  "healthhistory_by_sex",
   "apoe",
   "karyotype",
   "karyotype_by_site",
