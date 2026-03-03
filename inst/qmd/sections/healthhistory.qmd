@@ -1,6 +1,6 @@
 ```{r getting health history data from atri}
 #| echo: false
-#| eval: !expr params$healthhistory
+#| eval: !expr (params$healthhistory) | (params$healthhistory_by_sex)
 #| results: asis
 
 atriReporter:::format_quarto("Health History", "subsection")
@@ -22,6 +22,18 @@ healthhistory <- atriReporter::get_health(
   apply_labels = TRUE
 )
 
+if (params$healthhistory_by_sex) {
+  demographics <- atriReporter::get_demographics(de_gender, apply_labels = TRUE)
+  ids <- atriReporter:::get_ids(demographics)
+  healthhistory <- atriReporter::atri_join(
+    demographics,
+    healthhistory,
+    by = ids,
+    join_type = right_join
+  )
+}
+
+
 chd <- c("hh_asd", "hh_vsd", "hh_avcanal", "hh_terfal")
 chdlabels <- c(
   "Atrial Septal Defect (ASD)",
@@ -30,35 +42,82 @@ chdlabels <- c(
   "Tetralogy of Fallot"
 )
 
-healthhistory %>%
-  dplyr::select(dplyr::all_of(chd)) %>%
-  dplyr::mutate_at(dplyr::vars(hh_asd:hh_terfal), .funs = function(x) {
-    #x <- gsub(" \\/ |\\/ |\\/", "\n", x)
-    ifelse(is.na(x), "Unknown", as.character(x))
-  }) %>%
-  tidyr::pivot_longer(cols = dplyr::all_of(chd)) %>%
-  dplyr::group_by(`CHD Type` = name) %>%
-  dplyr::count(value) %>%
-  tidyr::pivot_wider(
-    id_cols = `CHD Type`,
-    names_from = value,
-    values_from = n,
-    values_fill = 0
-  ) %>%
-  dplyr::mutate(
-    `CHD Type` = factor(`CHD Type`, levels = chd, labels = chdlabels)
-  ) %>%
-  flextable::flextable() %>%
-  atriReporter:::ft_add_abcds_theme() %>%
-  flextable::width(j = 1, width = 2.25) %>%
-  flextable::width(j = 2:5, width = 0.75)
+create_chd_table <- function(data, filter_by = NULL) {
+  filter_by <- rlang::enquo(filter_by)
+
+  if (!rlang::quo_is_null(filter_by)) {
+    data <- dplyr::filter(data, {{ filter_by }})
+  }
+
+  data %>%
+    dplyr::select(dplyr::all_of(chd)) %>%
+    dplyr::mutate_at(dplyr::vars(hh_asd:hh_terfal), .funs = function(x) {
+      #x <- gsub(" \\/ |\\/ |\\/", "\n", x)
+      ifelse(is.na(x), "Unknown", as.character(x))
+    }) %>%
+    tidyr::pivot_longer(cols = dplyr::all_of(chd)) %>%
+    dplyr::group_by(`CHD Type` = name) %>%
+    dplyr::count(value) %>%
+    tidyr::pivot_wider(
+      id_cols = `CHD Type`,
+      names_from = value,
+      values_from = n,
+      values_fill = 0
+    ) %>%
+    dplyr::mutate(
+      `CHD Type` = factor(`CHD Type`, levels = chd, labels = chdlabels)
+    ) %>%
+    flextable::flextable() %>%
+    atriReporter:::ft_add_abcds_theme() %>%
+    flextable::width(j = 1, width = 2.25) %>%
+    flextable::width(j = 2:5, width = 0.75)
+}
+
+```
+
+
+
+```{r congenital heart disease}
+#| echo: false
+#| eval: !expr params$healthhistory
+#| results: asis
+
+create_chd_table(healthhistory)
+
+```
+
+```{r congenital heart disease males}
+#| echo: false
+#| eval: !expr params$healthhistory_by_sex
+#| results: asis
+
+atriReporter:::format_quarto(
+  "Congenital Heart Disease by Males",
+  type = "subsubsection"
+)
+
+create_chd_table(healthhistory, de_gender == "Male")
+
+```
+
+```{r congenital heart disease females}
+#| echo: false
+#| eval: !expr params$healthhistory_by_sex
+#| results: asis
+
+atriReporter:::format_quarto(
+  "Congenital Heart Disease by Females",
+  type = "subsubsection"
+)
+
+create_chd_table(healthhistory, de_gender == "Female")
 
 ```
 
 
 ```{r formatting table for absent, active, and inactive health history variables}
 #| echo: false
-#| eval: !expr params$healthhistory
+#| eval: !expr (params$healthhistory) | (params$healthhistory_by_sex)
 #| results: asis
 
 hhvars <- c(
@@ -82,44 +141,86 @@ hhvarlabels <- c(
   "Sleep Apnea"
 )
 
-type1 <- sum(healthhistory$hh_diabetes_type == "Type 1", na.rm = TRUE)
-type2 <- sum(healthhistory$hh_diabetes_type == "Type 2", na.rm = TRUE)
-diabetes_type <- paste0(
-  "Type 1 Diabetes (N = ",
-  type1,
-  "); Type 2 Diabetes (N = ",
-  type2,
-  ")"
-)
 
-healthhistory %>%
-  dplyr::select(dplyr::all_of(hhvars)) %>%
-  dplyr::mutate_at(dplyr::all_of(hhvars), .funs = function(x) {
-    x <- gsub("\\/ ", "\\/", x)
-    ifelse(is.na(x), "Unknown", x)
-  }) %>%
-  tidyr::pivot_longer(cols = dplyr::all_of(hhvars)) %>%
-  dplyr::group_by(`Health History` = name) %>%
-  dplyr::count(value) %>%
-  tidyr::pivot_wider(
-    id_cols = `Health History`,
-    names_from = value,
-    values_from = n,
-    values_fill = 0
-  ) %>%
-  dplyr::mutate(
-    `Health History` = factor(
-      `Health History`,
-      levels = hhvars,
-      labels = hhvarlabels
-    )
-  ) %>%
-  flextable::flextable() %>%
-  atriReporter:::ft_add_abcds_theme() %>%
-  flextable::width(j = 1:5, width = 1.05) %>%
-  flextable::add_footer_row(values = diabetes_type, colwidths = 5)
+create_health_conditions_table <- function(data, filter_by = NULL) {
+  filter_by <- rlang::enquo(filter_by)
+
+  if (!rlang::quo_is_null(filter_by)) {
+    data <- dplyr::filter(data, {{ filter_by }})
+  }
+
+  type1 <- sum(data$hh_diabetes_type == "Type 1", na.rm = TRUE)
+  type2 <- sum(data$hh_diabetes_type == "Type 2", na.rm = TRUE)
+  # fmt: skip
+  diabetes_type <- paste0("Type 1 Diabetes (N = ", type1, "); Type 2 Diabetes (N = ", type2, ")")
+
+  data %>%
+    dplyr::select(dplyr::all_of(hhvars)) %>%
+    dplyr::mutate_at(dplyr::all_of(hhvars), .funs = function(x) {
+      x <- gsub("\\/ ", "\\/", x)
+      ifelse(is.na(x), "Unknown", x)
+    }) %>%
+    tidyr::pivot_longer(cols = dplyr::all_of(hhvars)) %>%
+    dplyr::group_by(`Health History` = name) %>%
+    dplyr::count(value) %>%
+    tidyr::pivot_wider(
+      id_cols = `Health History`,
+      names_from = value,
+      values_from = n,
+      values_fill = 0
+    ) %>%
+    dplyr::mutate(
+      `Health History` = factor(
+        `Health History`,
+        levels = hhvars,
+        labels = hhvarlabels
+      )
+    ) %>%
+    flextable::flextable() %>%
+    atriReporter:::ft_add_abcds_theme() %>%
+    flextable::width(j = 1:5, width = 1.05) %>%
+    flextable::add_footer_row(values = diabetes_type, colwidths = 5)
+}
 
 ```
+
+```{r health conditions}
+#| echo: false
+#| eval: !expr params$healthhistory
+#| results: asis
+
+create_health_conditions_table(healthhistory)
+
+```
+
+```{r health conditions males}
+#| echo: false
+#| eval: !expr params$healthhistory_by_sex
+#| results: asis
+
+atriReporter:::format_quarto(
+  "Health Conditions by Males",
+  type = "subsubsection"
+)
+
+create_health_conditions_table(healthhistory, de_gender == "Male")
+
+```
+
+```{r health conditions females}
+#| echo: false
+#| eval: !expr params$healthhistory_by_sex
+#| results: asis
+
+atriReporter:::format_quarto(
+  "Health Conditions by Females",
+  type = "subsubsection"
+)
+
+create_health_conditions_table(healthhistory, de_gender == "Female")
+
+```
+
 
 
 ```{r formatting table for yes and no health history variables}
@@ -159,12 +260,24 @@ healthhistory %>%
 ```
 
 
-```{r get bmi by cycle}
+```{r get anthropometrics by cycle}
 #| echo: false
-#| eval: !expr params$healthhistory
+#| eval: !expr (params$healthhistory) | (params$healthhistory_by_sex)
 #| results: asis
 
 exam <- atriReporter::get_exam(ht, htu, wt, wtu, apply_labels = TRUE)
+
+if (params$healthhistory_by_sex) {
+  demographics <- atriReporter::get_demographics(de_gender, apply_labels = TRUE)
+  ids <- atriReporter:::get_ids(demographics)
+  exam <- atriReporter::atri_join(
+    demographics,
+    exam,
+    by = ids,
+    join_type = right_join
+  )
+  exam <- tidyr::fill(exam, de_gender, .by = subject_label, .direction = "down")
+}
 
 bmi <- exam %>%
   dplyr::group_by(subject_label) %>%
@@ -199,7 +312,6 @@ bmi <- exam %>%
 
 bmi$event_label <- gsub(" - Month [0-9]{1,2}", "", bmi$event_label)
 
-
 variables <- list(
   "Height (cm)" = "htcm",
   "Height (in)" = "htin",
@@ -208,27 +320,74 @@ variables <- list(
   "BMI" = "bmi"
 )
 
-bmi %>%
-  dplyr::filter(event_code != "cyc4") %>%
-  dplyr::group_by(Cycle = event_label) %>%
-  dplyr::mutate(Total = 1L) %>%
-  dplyr::summarise_at(dplyr::vars(htcm:Total), sum) %>%
-  dplyr::mutate_at(dplyr::vars(htcm:bmi), .funs = function(x) {
-    round(x / .$Total, 1)
-  }) %>%
-  dplyr::mutate_all(as.character) %>%
-  dplyr::rename(!!!variables) %>%
-  dplyr::mutate(Cycle = paste0(Cycle, " \n(N = ", Total, ")"), Total = NULL) %>%
-  tidyr::pivot_longer(
-    cols = `Height (cm)`:Underweight,
-    names_to = "Variable"
-  ) %>%
-  tidyr::pivot_wider(names_from = Cycle) %>%
-  flextable::flextable() %>%
-  atriReporter:::ft_add_abcds_theme() %>%
-  flextable::width(width = 5.3 / 4)
+create_bmi_table <- function(data, filter_by = NULL) {
+  filter_by <- rlang::enquo(filter_by)
 
-atriReporter:::format_quarto(type = "newpage")
+  if (!rlang::quo_is_null(filter_by)) {
+    data <- dplyr::filter(data, {{ filter_by }})
+  }
+
+  data %>%
+    dplyr::filter(event_code != "cyc4") %>%
+    dplyr::group_by(Cycle = event_label) %>%
+    dplyr::mutate(Total = 1L) %>%
+    dplyr::summarise_at(dplyr::vars(htcm:Total), sum) %>%
+    dplyr::mutate_at(dplyr::vars(htcm:bmi), .funs = function(x) {
+      round(x / .$Total, 1)
+    }) %>%
+    dplyr::mutate_all(as.character) %>%
+    dplyr::rename(!!!variables) %>%
+    dplyr::mutate(
+      Cycle = paste0(Cycle, " \n(N = ", Total, ")"),
+      Total = NULL
+    ) %>%
+    tidyr::pivot_longer(
+      cols = `Height (cm)`:Underweight,
+      names_to = "Variable"
+    ) %>%
+    tidyr::pivot_wider(names_from = Cycle) %>%
+    flextable::flextable() %>%
+    atriReporter:::ft_add_abcds_theme() %>%
+    flextable::width(width = 5.3 / 4)
+}
+
+```
+
+
+```{r anthropometrics}
+#| echo: false
+#| eval: !expr params$healthhistory
+#| results: asis
+
+create_bmi_table(bmi)
+
+```
+
+```{r anthropometrics males}
+#| echo: false
+#| eval: !expr params$healthhistory_by_sex
+#| results: asis
+
+atriReporter:::format_quarto(
+  "Anthropometrics by Males",
+  type = "subsubsection"
+)
+
+create_bmi_table(bmi, de_gender == "Male")
+
+```
+
+```{r anthropometrics females}
+#| echo: false
+#| eval: !expr params$healthhistory_by_sex
+#| results: asis
+
+atriReporter:::format_quarto(
+  "Anthropometrics by Females",
+  type = "subsubsection"
+)
+
+create_bmi_table(bmi, de_gender == "Female")
 
 ```
 

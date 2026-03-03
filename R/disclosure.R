@@ -136,7 +136,7 @@ get_disclosure <- function(
 
   data %>%
     dplyr::filter(!dplyr::if_all(all_of(all_vars), ~ is.na(.x))) %>%
-    dplyr::arrange(subject_label, event_code)
+    dplyr::arrange(.data$subject_label, .data$event_code)
 }
 
 # devtools::load_all()

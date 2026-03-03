@@ -116,14 +116,15 @@ get_demographics <- function(
 calculate_age_at_visit <- function(data) {
   ptdoby <-
     get_demographics(ptdob, de_eval_date) |>
-    dplyr::arrange(subject_label, event_code) |>
-    tidyr::fill(ptdob, .by = "subject_label", .direction = "down") |>
+    dplyr::arrange(.data$subject_label, .data$event_code) |>
+    tidyr::fill(.data$ptdob, .by = "subject_label", .direction = "down") |>
     dplyr::mutate(
-      de_eval_date = as.Date(de_eval_date, format = "%Y-%m-%d"),
-      de_eval_year = as.numeric(format(de_eval_date, "%Y")),
-      age_at_visit = de_eval_year - as.numeric(ptdob)
+      de_eval_date = as.Date(.data$de_eval_date, format = "%Y-%m-%d"),
+      de_eval_year = as.numeric(format(.data$de_eval_date, "%Y")),
+      age_at_visit = .data$de_eval_year - as.numeric(.data$ptdob)
     )
 
+  ids <- get_ids(data)
   # fmt: skip
-  atri_join(data, ptdoby[, c(ids, "age_at_visit")], by = get_ids(data), join_type = left_join)
+  atri_join(data, ptdoby[, c(ids, "age_at_visit")], by = ids, join_type = dplyr::left_join)
 }

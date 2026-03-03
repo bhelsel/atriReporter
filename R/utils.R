@@ -308,14 +308,22 @@ get_ids <- function(data) {
 #' @rdname format_quarto
 #' @keywords internal
 #' @importFrom glue glue
+#' @export
 
-format_quarto <- function(x = NULL, type) {
+format_quarto <- function(x = NULL, type, width = 100) {
   if (type == "section") {
-    cat(glue::glue("\\subsection{{{x}}}"), sep = "\n")
+    cat(glue::glue("\\section{{{x}}}"), sep = "\n")
   } else if (type == "subsection") {
     cat(glue::glue("\\subsection{{{x}}}"), sep = "\n")
+  } else if (type == "subsubsection") {
+    cat(glue::glue("\\subsubsection{{{x}}}"), sep = "\n")
   } else if (type == "newpage") {
     cat("\\newpage")
+  } else if (type == "input") {
+    cat(glue::glue("\\input{{{x}}}"), sep = "\n")
+  } else if (type == "strwrap") {
+    cat(strwrap(x, width = width), fill = TRUE)
+    cat("\n\n")
   }
 }
 

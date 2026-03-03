@@ -98,14 +98,22 @@ get_imaging <- function(
             pattern = "CENTILOID"
         ) %>%
             dplyr::rename(
-                subject_label = `Subject ID`,
-                event_code = Scan,
-                centiloid = CL
+                subject_label = .data$`Subject ID`,
+                event_code = .data$Scan,
+                centiloid = .data$CL
             ) %>%
             dplyr::mutate(
-                event_code = ifelse(event_code == "bl", "sc2", event_code)
+                event_code = ifelse(
+                    .data$event_code == "bl",
+                    "sc2",
+                    .data$event_code
+                )
             ) %>%
-            dplyr::select(subject_label, event_code, centiloid)
+            dplyr::select(
+                .data$subject_label,
+                .data$event_code,
+                .data$centiloid
+            )
 
         data <- dplyr::full_join(
             data,

@@ -4,7 +4,7 @@
 \alias{format_quarto}
 \title{FUNCTION_TITLE}
 \usage{
-format_quarto(x = NULL, type)
+format_quarto(x = NULL, type, width = 100)
 }
 \arguments{
 \item{x}{PARAM_DESCRIPTION}
