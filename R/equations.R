@@ -228,13 +228,22 @@ check_all_equations <- function(
   # fmt: skip
   tasks <- c("ntgedsd", "dld", "npi", "reiss", "dsmse", "recall", "iq", "cancellation", "verbal", "tbatgs", "blockwisc")
 
+  # Can merge codebook labels when there are fewer changes
+  #cb <- purrr::map_dfr(tasks, ~ get_codebook(abcds, !!.x))
+
   assessments_by_task <-
     tasks |>
     purrr::map(~ check_equations(task = !!.x, equations = equations)) |>
     `names<-`(tasks)
 
   if (by_site) {
-    all_assessments <- dplyr::bind_rows(assessments_by_task)
+    all_assessments <-
+      purrr::imap_dfr(
+        assessments_by_task,
+        ~ dplyr::mutate(.x, task = .y, )
+      ) |>
+      dplyr::relocate(task, .before = variable)
+
     assessments_by_site <-
       sites |>
       purrr::map(~ all_assessments[all_assessments$site_initials == .x, ]) |>
@@ -286,3 +295,14 @@ check_all_equations <- function(
     }
   }
 }
+
+# devtools::load_all()
+# check_all_equations(
+#   by_site = TRUE,
+#   by_task = FALSE,
+#   writeFile = TRUE,
+#   outdir = "/Users/bhelsel/Desktop"
+# )
+
+# equations <- read.csv("inst/extdata/equations.csv")
+# check_equations(recall, equations)
