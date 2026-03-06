@@ -62,11 +62,7 @@ get_atri_server <- function(study, ...) {
   env_var <- retrieve_from_environment(study, type = "server")
   server <- Sys.getenv(env_var)
   url <- paste(purrr::map(path, rlang::as_string), collapse = "/")
-  if (study == "abcds") {
-    paste0(server, "/", url, "/", "?pageSize=100")
-  } else {
-    paste0(server, "/", url, "/?page_size=100")
-  }
+  paste0(server, "/", url)
 }
 
 #' @title Make a GET Request to the ATRI EDC API
@@ -200,9 +196,16 @@ get_atri_data <- function(response, xlsx = FALSE) {
 #' Retrieves API links for folders and files stored in the ATRI EDC for a given study,
 #' optionally navigating through additional subfolders.
 #'
-#' @param study The name of the study on the ATRI EDC for which to request files.
+#' @param study A symbol or string identifying the study (e.g., `abcds`, `trcds`,
+#'   `test_trcds`). Used to retrieve the appropriate API token and server.
+#' @param topic A symbol or string identifying the ATRI storage topic
+#'   (e.g., `s3_archive`, `s3_topic`, `topics`).
+#' @param topic_code A symbol or string identifying the specific topic code
+#'   within the ATRI system (e.g., `data_lake`, `data_pond_brain_health_report`).
 #' @param ... Additional subfolders or path segments appended to the server path
 #'   to locate specific files.
+#' @param site A character string specifying the site code associated with the
+#'   uploaded file.
 #'
 #' @return
 #' A character vector containing API links to the folders or files stored in the ATRI EDC.
@@ -224,19 +227,155 @@ get_atri_data <- function(response, xlsx = FALSE) {
 #' @export
 #' @importFrom rlang ensym is_symbol as_string
 
-get_atri_files <- function(study, ...) {
-  subfolders <- rlang::ensyms(...)
+get_atri_files <- function(study, topic, topic_code, ..., site = NULL) {
+  # abcds, trcds, test_trcds
   study <- rlang::ensym(study)
-  server <- if (length(subfolders) >= 1) {
-    get_atri_server(!!study, items, !!!subfolders)
-  } else {
-    get_atri_server(!!study, items)
-  }
+  # s3_archive, s3_topic, topics
+  topic <- rlang::ensym(topic)
+  # data_lake, data_pond_brain_health_report
+  topic_code <- rlang::ensym(topic_code)
+  subfolders <- rlang::ensyms(...)
+
   token <- get_atri_token(!!study)
-  data <- memoise_atri_get(server, token)
-  return(data$public_api)
+  s3 <- grepl("s3", as.character(topic))
+
+  endpoint <- if (s3) {
+    quote(items)
+  } else {
+    if (!is.null(site)) {
+      site_query <- sprintf("?site_code=%s&output_format=json", site)
+    }
+    as.symbol(paste0("files", site_query))
+  }
+
+  # Call with or without subfolders
+  server <- if (length(subfolders) >= 1) {
+    get_atri_server(!!study, !!topic, !!topic_code, !!endpoint, !!!subfolders)
+  } else {
+    get_atri_server(!!study, !!topic, !!topic_code, !!endpoint)
+  }
+
+  page_size <- if (!!study == "abcds") "/?pageSize=100" else "/?page_size=100"
+
+  if (s3) {
+    url <- paste0(server, page_size)
+    return <- "public_api"
+  } else {
+    url <- server
+    return <- c("label", "code")
+  }
+
+  data <- memoise_atri_get(url, token)
+  return(data[, return, drop = TRUE])
 }
 
+#' Upload a file to the ATRI API
+#'
+#' Uploads a file to the ATRI server for a specified study, topic, and site using
+#' a multipart POST request. The function retrieves the appropriate API token and
+#' server endpoint based on the supplied study and topic information, then uploads
+#' the file with associated metadata.
+#'
+#' @param study A symbol or string identifying the study (e.g., `abcds`, `trcds`,
+#'   `test_trcds`). Used to retrieve the appropriate API token and server.
+#' @param topic A symbol or string identifying the ATRI storage topic
+#'   (e.g., `s3_archive`, `s3_topic`, `topics`).
+#' @param topic_code A symbol or string identifying the specific topic code
+#'   within the ATRI system (e.g., `data_lake`, `data_pond_brain_health_report`).
+#' @param site A character string specifying the site code associated with the
+#'   uploaded file.
+#' @param label A short character string used as the file label in the ATRI system.
+#' @param description A character string providing a longer description of the file.
+#' @param source_file A file path to the file to be uploaded. The file is uploaded
+#'   as a multipart form field. Currently assumed to be a PDF.
+#'
+#' @return An HTTP response object returned by \pkg{httr2} from
+#'   \code{httr2::req_perform()}. This object contains the server response and
+#'   status information for the upload request.
+#'
+#' @details
+#' This function constructs a multipart POST request using \pkg{httr2}. The file
+#' is uploaded using \code{curl::form_file()} and sent along with metadata fields
+#' required by the ATRI API. Authentication is handled via a token retrieved by
+#' \code{get_atri_token()}, and the target server endpoint is determined using
+#' \code{get_atri_server()}.
+#'
+#' @examples
+#' \dontrun{
+#' post_atri_files(
+#'   study = abcds,
+#'   topic = s3_archive,
+#'   topic_code = data_lake,
+#'   site = "123",
+#'   label = "Brain Health Report",
+#'   description = "Participant brain health feedback report",
+#'   source_file = "report.pdf"
+#' )
+#' }
+#'
+#' @seealso
+#' \code{\link{get_atri_token}}, \code{\link{get_atri_server}}
+#'
+#' @importFrom httr2 request req_headers req_body_multipart req_perform
+#' @importFrom curl form_file
+#'
+#' @export
+
+post_atri_files <- function(
+  study,
+  topic,
+  topic_code,
+  site,
+  label,
+  description,
+  source_file
+) {
+  # abcds, trcds, test_trcds
+  study <- rlang::ensym(study)
+  token <- get_atri_token(!!study)
+  # s3_archive, s3_topic, topics
+  topic <- rlang::ensym(topic)
+  # data_lake, data_pond_brain_health_report
+  topic_code <- rlang::ensym(topic_code)
+
+  # Check for existing file
+  existing <- get_atri_files(!!study, !!topic, !!topic_code, site = site)
+  indx <- which(existing$label == label)
+  code <- existing[["code"]][indx]
+
+  if (!rlang::is_empty(code)) {
+    server <- get_atri_server(!!study, files, !!code)
+    message(server)
+    body <- list(
+      topic_code = as.character(topic_code),
+      site_code = site,
+      source_file = curl::form_file(source_file, type = "application/pdf"),
+      file_code = code,
+      reason_for_change = "Adding an Updated Form"
+    )
+  } else {
+    server <- get_atri_server(!!study, !!topic, !!topic_code, files)
+    message(server)
+    body <- list(
+      topic_code = as.character(topic_code),
+      site_code = site,
+      label = label,
+      description = description,
+      source_file = curl::form_file(source_file, type = "application/pdf"),
+    )
+  }
+
+  server <- sprintf("%s?site_code=%s", server, site)
+
+  response <- httr2::request(server) %>%
+    httr2::req_headers(
+      Authorization = token
+    ) %>%
+    httr2::req_body_multipart(!!!body) |>
+    httr2::req_perform()
+
+  return(response)
+}
 
 #' @title Import a CSV File from the ATRI EDC
 #'
