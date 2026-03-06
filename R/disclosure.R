@@ -45,7 +45,8 @@ get_disclosure <- function(
       site = site,
       cycle = cycle,
       apply_labels = apply_labels
-    )
+    ) |>
+      calculate_age_at_visit()
   } else if (study == "trcds") {
     demographics <- get_registry(
       !!!key$registry,
@@ -96,7 +97,10 @@ get_disclosure <- function(
     site = site,
     cycle = cycle,
     apply_labels = apply_labels
-  )
+  ) |>
+    dplyr::mutate(
+      dplyr::across(dplyr::all_of(key$exam), ~ as.numeric(.x))
+    )
 
   # ABC-DS and TRC-DS Codebook: Weight: 1 = Pounds, 2 = Kilograms; Height: 1 = Inches, 2 = Centimeters
   convert_to_metric <- function(variable, unit, type = c("height", "weight")) {
