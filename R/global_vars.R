@@ -95,7 +95,7 @@ if (getRversion() >= "2.15.1") {
 # fmt: skip
 .disclosure_key <- list(
   abcds = list(
-    demographics = c("de_eval_date", "de_gender", "age_at_visit"),
+    demographics = c("de_eval_date", "de_gender"),
     dsmse = c("dsto2", "dsla2", "colshbx", "dsme1", "dsvs1"),
     recall = c("frssa", "frssb", "crssa", "crssb"),
     ntgedsd = c("adltot", "ntlctot", "ntswtot", "ntambtot", "ntmemtot", "ntbehtot", "ntsrptot", "ntootot"),
