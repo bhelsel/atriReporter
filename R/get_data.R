@@ -46,10 +46,12 @@ get_data <- function(
 ) {
   dataset <- rlang::as_string(rlang::enexpr(dataset))
   if (study == "abcds") {
-    files <- get_atri_files(abcds, edc, crf_data_exclude_phi, latest)
+    # fmt: skip
+    files <- get_atri_files(abcds, s3_archive, data_lake, edc, crf_data_exclude_phi, latest)
     data <- import_atri_file(abcds, files, !!dataset)
   } else if (study == "trcds") {
-    files <- get_atri_files(trcds, "Clinical%20Data", crf_data)
+    # fmt: skip
+    files <- get_atri_files(trcds, s3_topic, data_pond_brain_health_report, "Clinical%20Data", crf_data)
     data <- import_atri_file(trcds, files, !!dataset)
   }
 
@@ -81,12 +83,13 @@ get_data <- function(
       data$site_label
     )
 
-    control_identifiers <- get_sibling_controls()
-
-    if (controls) {
-      data <- data[data$subject_label %in% control_identifiers, ]
-    } else {
-      data <- data[!data$subject_label %in% control_identifiers, ]
+    if (study == "abcds") {
+      control_identifiers <- get_sibling_controls()
+      if (controls) {
+        data <- data[data$subject_label %in% control_identifiers, ]
+      } else {
+        data <- data[!data$subject_label %in% control_identifiers, ]
+      }
     }
   }
 

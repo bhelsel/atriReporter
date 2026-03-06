@@ -43,11 +43,17 @@
 get_codebook <- function(study, codebook) {
   study <- rlang::ensym(study)
   codebook <- rlang::ensym(codebook)
-  data_dict <- import_atri_file(
-    !!study,
-    get_atri_files(!!study, edc, data_dictionary, latest),
-    !!codebook
-  )
+
+  if (study == "abcds") {
+    # fmt: skip
+    files <- get_atri_files(abcds, s3_archive, data_lake, edc, data_dictionary, latest)
+    data_dict <- import_atri_file(abcds, files, !!codebook)
+  } else if (study == "trcds") {
+    # fmt: skip
+    files <- get_atri_files(trcds, s3_topic, data_pond_brain_health_report, "Clinical%20Data", data_dictionary)
+    data_dict <- import_atri_file(trcds, files, !!codebook)
+  }
+
   data_dict <- data.frame(
     field_name = data_dict$dd_revision_field_name,
     field_question = data_dict$dd_revision_field_question_e,

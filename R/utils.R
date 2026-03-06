@@ -335,7 +335,8 @@ format_quarto <- function(x = NULL, type, width = 100) {
 #' @export
 
 get_sibling_controls <- function() {
-  files <- get_atri_files(abcds, edc, crf_data_exclude_phi, latest)
+  # fmt: skip
+  files <- get_atri_files(abcds, s3_archive, data_lake, edc, crf_data_exclude_phi, latest)
   data <- import_atri_file(abcds, files, control)
   sibling_control_identifiers <- data[
     data$dd_field_name == "sibptid1",

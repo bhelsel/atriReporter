@@ -4,13 +4,23 @@
 \alias{get_atri_files}
 \title{Retrieve ATRI EDC File Links}
 \usage{
-get_atri_files(study, ...)
+get_atri_files(study, topic, topic_code, ..., site = NULL)
 }
 \arguments{
-\item{study}{The name of the study on the ATRI EDC for which to request files.}
+\item{study}{A symbol or string identifying the study (e.g., \code{abcds}, \code{trcds},
+\code{test_trcds}). Used to retrieve the appropriate API token and server.}
+
+\item{topic}{A symbol or string identifying the ATRI storage topic
+(e.g., \code{s3_archive}, \code{s3_topic}, \code{topics}).}
+
+\item{topic_code}{A symbol or string identifying the specific topic code
+within the ATRI system (e.g., \code{data_lake}, \code{data_pond_brain_health_report}).}
 
 \item{...}{Additional subfolders or path segments appended to the server path
 to locate specific files.}
+
+\item{site}{A character string specifying the site code associated with the
+uploaded file.}
 }
 \value{
 A character vector containing API links to the folders or files stored in the ATRI EDC.

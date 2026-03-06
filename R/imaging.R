@@ -91,7 +91,8 @@ get_imaging <- function(
 
     # Retrieve Centiloid Values for TRC-DS study only
     if (imaging == "amymeta" & study == "trcds") {
-        file <- get_atri_files(trcds, "External%20Data")
+        # fmt: skip
+        file <- get_atri_files(trcds, s3_topic, data_pond_brain_health_report, "External%20Data")
         centiloid <- import_atri_file(
             trcds,
             files = file,
