@@ -12,6 +12,7 @@ reiss,reissparan,compr + hallr + hostr + ovser + parar
 reiss,reissdepb,anxr + cryr + fearr + ovser + sadnr
 reiss,reissdepp,bodyr + eatpr + lower + regbr + slppr
 reiss,reissdpb,anxr + attnr + bodyr + compr + depdr
+reiss,reissav,inatr + lower + nonar + socir + withr
 dsmse,colmemscr,colshbx + dsme1
 dsmse,nonmemory,dspi1 + dsap1 + dsla2 + dsvs1 + dske1
 dsmse,dsmse_to2,dsto2 - colshbx
@@ -30,7 +31,7 @@ recall,tifrrepssa,ift1rsa + ift2rsa + ift3rsa
 recall,agfrin1sa,ift1sa + ift1rsa
 recall,agfrin2sa,ift2sa + ift2rsa
 recall,agfrin3sa,ift3sa + ift3rsa
-recall,tifrrepssa,agfrin1sa + agfrin2sa + agfrin3sa
+recall,tafisa,agfrin1sa + agfrin2sa + agfrin3sa
 recall,tafisa,tifrsa + tifrrepssa
 recall,frssb,frt1sb + frt2sb + frt3sb
 recall,crssb,crt1sb + crt2sb + crt3sb
@@ -45,7 +46,7 @@ recall,tifrrepssb,ift1rsb + ift2rsb + ift3rsb
 recall,agfrin1sb,ift1sb + ift1rsb
 recall,agfrin2sb,ift2sb + ift2rsb
 recall,agfrin3sb,ift3sb + ift3rsb
-recall,tifrrepssb,agfrin1sb + agfrin2sb + agfrin3sb
+recall,tafisb,agfrin1sb + agfrin2sb + agfrin3sb
 recall,tafisb,tifrsb + tifrrepssb
 iq,kbit2verbraw,kbit2verbkraw + kbit2ridraw
 cancellation,totcorr,tacorr + hscorr + plcorr + lacorr

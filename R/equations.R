@@ -297,6 +297,14 @@ check_all_equations <- function(
 }
 
 # devtools::load_all()
+
+# originals <- c(61, 202, 96, 56, 87, 151, 71, 29, 69, 32)
+#  UPITT   UCISOM      MGH    WASHU      UWI      UKY NYSIBRDD     UCAM     KUMC   PRUCDD
+#    61      202       96       56       87      151       71       29       69       32
+
+# checks <- check_all_equations(by_site = TRUE, by_task = FALSE)
+# do.call("c", lapply(checks, nrow)) - originals
+
 # check_all_equations(
 #   by_site = TRUE,
 #   by_task = FALSE,
