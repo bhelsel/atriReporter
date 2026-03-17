@@ -16,15 +16,16 @@ reiss,reissav,inatr + lower + nonar + socir + withr
 dsmse,colmemscr,colshbx + dsme1
 dsmse,nonmemory,dspi1 + dsap1 + dsla2 + dsvs1 + dske1
 dsmse,dsmse_to2,dsto2 - colshbx
+dsmse,dsmse_to2,dspi1 + dsme1 + dsap1 + dsla2 + dsvs1 + dske1
 dsmse,dsto2,dspi1 + colshbx + dsme1 + dsap1 + dsla2 + dsvs1 + dske1
 dsmse,dsto2,colmemscr + nonmemory
 recall,frssa,frt1sa + frt2sa + frt3sa
 recall,crssa,crt1sa + crt2sa + crt3sa
 recall,trssa,frssa + crssa
-recall,fcrec1sa,frt1sa + crt1sa
-recall,fcrec2sa,frt2sa + crt2sa
-recall,fcrec3sa,frt3sa + crt3sa
-recall,trssa,fcrec1sa + fcrec2sa + fcrec3sa
+recall,frcr1sa,frt1sa + crt1sa
+recall,frcr2sa,frt2sa + crt2sa
+recall,frcr3sa,frt3sa + crt3sa
+recall,trssa,frcr1sa + frcr2sa + frcr3sa
 recall,ticrsa,ict1sa + ict2sa + ict3sa
 recall,tifrsa,ift1sa + ift2sa + ift3sa
 recall,tifrrepssa,ift1rsa + ift2rsa + ift3rsa
@@ -36,10 +37,10 @@ recall,tafisa,tifrsa + tifrrepssa
 recall,frssb,frt1sb + frt2sb + frt3sb
 recall,crssb,crt1sb + crt2sb + crt3sb
 recall,trssb,frssb + crssb
-recall,fcrec1sb,frt1sb + crt1sb
-recall,fcrec2sb,frt2sb + crt2sb
-recall,fcrec3sb,frt3sb + crt3sb
-recall,trssb,fcrec1sb + fcrec2sb + fcrec3sb
+recall,frcr1sb,frt1sb + crt1sb
+recall,frcr2sb,frt2sb + crt2sb
+recall,frcr3sb,frt3sb + crt3sb
+recall,trssb,frcr1sb + frcr2sb + frcr3sb
 recall,ticrsb,ict1sb + ict2sb + ict3sb
 recall,tifrsb,ift1sb + ift2sb + ift3sb
 recall,tifrrepssb,ift1rsb + ift2rsb + ift3rsb
