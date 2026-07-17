@@ -226,7 +226,7 @@ check_all_equations <- function(
   )
 
   # fmt: skip
-  sites <- c("UPITT", "UCISOM", "MGH", "WASHU", "UWI", "UKY", "NYSIBRDD", "UCAM", "KUMC", "PRUCDD")
+  sites <- c("UPITT", "UCISOM", "MGH", "WASHU", "UWI", "UKY", "NYSIBRDD", "UCAM", "KUMC", "PRUCDD", "UNTHSC")
   tasks <- unique(equations[, c("name", "task")])
 
   # Can merge codebook labels when there are fewer changes
@@ -273,11 +273,12 @@ check_all_equations <- function(
     }
   }
 
-  if (by_task & writeFile & !is.null(outdir)) {
-    assessments_by_task <-
-      tasks[["task"]] |>
-      purrr::map(~ all_assessments[all_assessments$task == .x, ]) |>
-      `names<-`(tasks[["task"]])
+  if (by_task) {}
+  assessments_by_task <-
+    tasks[["task"]] |>
+    purrr::map(~ all_assessments[all_assessments$task == .x, ]) |>
+    `names<-`(tasks[["task"]])
+  if (writeFile & !is.null(outdir)) {
     wb <- openxlsx::createWorkbook()
     purrr::walk(tasks[["task"]], .f = function(.x) {
       openxlsx::addWorksheet(wb, sheet = .x)
@@ -302,7 +303,7 @@ check_all_equations <- function(
       return(assessments_by_task)
     }
     if (by_site) {
-      assessments_by_site
+      return(assessments_by_site)
     }
   }
 }
