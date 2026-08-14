@@ -156,14 +156,24 @@ apply_factor_labels <- function(data, dictionary) {
 
   dictionary <- dictionary[grepl("[{}]", dictionary$field_code), ]
 
-  dictionary <- purrr::map(dictionary$field_code, function(x) {
-    parsed <- jsonlite::fromJSON(gsub("'", '"', x))
-    list(
-      levels = as.numeric(names(parsed)),
-      labels = gsub("\\/\n|\\/ ", " ", unname(unlist(parsed)))
-    )
-  }) %>%
+  dictionary <- purrr::map(
+    dictionary$field_code,
+    function(x) {
+      tryCatch(
+        {
+          parsed <- jsonlite::fromJSON(gsub("'", '"', x))
+          list(
+            levels = as.numeric(names(parsed)),
+            labels = gsub("\\/\n|\\/ ", " ", unname(unlist(parsed)))
+          )
+        },
+        error = \(e) NULL
+      )
+    }
+  ) %>%
     `names<-`(., dictionary$field_name)
+
+  dictionary <- purrr::compact(dictionary)
 
   check_all <- c("de_race", "mrseqs")
 
