@@ -203,6 +203,9 @@ gt_add_abcds_theme <- function(
   header_color = "#2C3E50",
   stripe_color = "#F8F9FA"
 ) {
+  tbl_rows <- nrow(gt_tbl[["_data"]])
+  col_names <- names(gt_tbl[["_data"]])
+
   gt_tbl <- gt_tbl %>%
     # Set table font and size
     gt::opt_table_font(
@@ -242,14 +245,17 @@ gt_add_abcds_theme <- function(
       style = gt::cell_text(color = "#2C3E50", size = gt::px(14)),
       locations = gt::cells_body()
     ) %>%
-    gt::opt_row_striping(row_striping = TRUE) %>%
-    gt::tab_style(
-      style = gt::cell_fill(color = stripe_color),
-      locations = gt::cells_body(rows = seq(2, nrow(gt_tbl[["_data"]]), 2))
-    )
+    gt::opt_row_striping(row_striping = TRUE)
+
+  if (tbl_rows > 1) {
+    gt_tbl <- gt_tbl %>%
+      gt::tab_style(
+        style = gt::cell_fill(color = stripe_color),
+        locations = gt::cells_body(rows = seq(2, tbl_rows, 2))
+      )
+  }
 
   # Center all columns except the first column
-  col_names <- names(gt_tbl[["_data"]])
   if (length(col_names) > 1) {
     gt_tbl <- gt_tbl %>%
       gt::cols_align(
