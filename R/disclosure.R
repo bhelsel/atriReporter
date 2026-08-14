@@ -68,10 +68,12 @@ get_disclosure <- function(
     apply_labels = apply_labels
   )
 
+  recall_task <- if (study == "abcds") "recall" else "cogrecall"
+
   recall <- get_cognition(
     !!!key$recall,
     study = study,
-    task = recall,
+    task = !!rlang::sym(recall_task),
     site = site,
     cycle = cycle,
     apply_labels = apply_labels

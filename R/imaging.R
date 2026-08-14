@@ -96,7 +96,7 @@ get_imaging <- function(
         centiloid <- import_atri_file(
             trcds,
             files = file,
-            pattern = "CENTILOID"
+            pattern = "TRC-DS_PROD_WISC_CENTILOID_FULL_20250317"
         ) %>%
             dplyr::rename(
                 subject_label = .data$`Subject ID`,

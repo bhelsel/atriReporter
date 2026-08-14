@@ -442,9 +442,13 @@ import_atri_file <- function(
   study <- rlang::ensym(study)
   pattern <- try(rlang::ensym(pattern), silent = TRUE)
   if (!is.null(url)) {
-    server = url
+    server <- url
   } else if (!is.null(files) & !is.null(pattern)) {
-    server <- files[grepl(pattern, files)]
+    indx <- which(sub("_.*|.csv$|.xlsx$", "", basename(files)) == pattern)
+    if (length(indx) == 0) {
+      indx <- which(sub(".csv$|.xlsx$", "", basename(files)) == pattern)
+    }
+    server <- files[indx]
     if (length(server) > 1) {
       cli::cli_abort(c(
         "x" = glue::glue("{pattern} matches multiple files."),

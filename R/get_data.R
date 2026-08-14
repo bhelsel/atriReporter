@@ -45,6 +45,8 @@ get_data <- function(
   controls = FALSE
 ) {
   dataset <- rlang::as_string(rlang::enexpr(dataset))
+  codebook <- rlang::as_string(rlang::enexpr(codebook))
+
   if (study == "abcds") {
     # fmt: skip
     files <- get_atri_files(abcds, s3_archive, data_lake, edc, crf_data_exclude_phi, latest)
@@ -70,6 +72,10 @@ get_data <- function(
   if (study == "abcds") {
     if (!rlang::is_empty(variables)) {
       data <- data[data$dd_field_name %in% variables, ]
+    } else {
+      cb <- get_codebook(abcds, !!codebook)
+      variables <- cb$field_name
+      data <- data[data$dd_field_name %in% variables, ]
     }
 
     # examdate and mrseqs are found in translated value instead of field value
@@ -92,8 +98,6 @@ get_data <- function(
       }
     }
   }
-
-  codebook <- rlang::as_string(rlang::enexpr(codebook))
 
   # Only set up for abcds right now
   if (study == "abcds" & apply_labels) {
