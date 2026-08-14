@@ -395,13 +395,19 @@ atri_pivot_wider <- function(data, dataset) {
     }
   }
 
-  data <- tidyr::pivot_wider(
-    data,
-    id_cols = dplyr::all_of(ids),
-    names_from = dd_field_name,
-    values_from = dd_revision_field_value,
-    values_fn = if (dataset %in% duplicates) safe_max else NULL
-  )
+  suppressWarnings({
+    data <- tidyr::pivot_wider(
+      data,
+      id_cols = dplyr::all_of(ids),
+      names_from = dd_field_name,
+      values_from = dd_revision_field_value,
+      values_fn = if (dataset %in% duplicates) safe_max else NULL
+    )
+  })
+
+  if (any(purrr::map_lgl(data, is.list))) {
+    data <- tidyr::unnest(data, cols = dplyr::where(is.list))
+  }
 
   class(data) <- custom_classes
   return(data)
