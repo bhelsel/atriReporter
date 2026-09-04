@@ -117,7 +117,7 @@ check_equations <- function(task, equations) {
 
   data <- dplyr::mutate(data, dplyr::across(variables, ~ as.numeric(.x)))
 
-  purrr::map2(values, formulas, .f = function(.x, .y) {
+  incorrect_values <- purrr::map2_dfr(values, formulas, .f = function(.x, .y) {
     current_values <- data[[.x]]
     expected_values <- rlang::eval_tidy(rlang::parse_expr(.y), data = data)
     checks <- abs(current_values - expected_values) < 1e-6
@@ -131,8 +131,9 @@ check_equations <- function(task, equations) {
       result$expected <- expected_values[indx]
       return(result)
     }
-  }) |>
-    dplyr::bind_rows()
+  })
+
+  return(incorrect_values)
 }
 
 #' Write Equation Check Results to Excel
@@ -245,7 +246,13 @@ check_all_equations <- function(
           task = !!x,
           name = setNames(tasks[["name"]], tasks[["task"]])[task]
         )
-    }) |>
+    })
+
+  if (nrow(all_assessments) == 0) {
+    return(NULL)
+  }
+
+  all_assessments <- all_assessments |>
     dplyr::relocate(name, task, .before = "variable") |>
     # fmt: skip
     dplyr::right_join(x = eval[, c(id_cols, "de_eval_date")], y = _, by = id_cols)
@@ -273,11 +280,13 @@ check_all_equations <- function(
     }
   }
 
-  if (by_task) {}
-  assessments_by_task <-
-    tasks[["task"]] |>
-    purrr::map(~ all_assessments[all_assessments$task == .x, ]) |>
-    `names<-`(tasks[["task"]])
+  if (by_task) {
+    assessments_by_task <-
+      tasks[["task"]] |>
+      purrr::map(~ all_assessments[all_assessments$task == .x, ]) |>
+      `names<-`(tasks[["task"]])
+  }
+
   if (writeFile & !is.null(outdir)) {
     wb <- openxlsx::createWorkbook()
     purrr::walk(tasks[["task"]], .f = function(.x) {
